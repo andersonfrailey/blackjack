@@ -35,3 +35,5 @@
    - Give user the ability to picks the number of people they play with
 
 - Add method for adding a card that can replace the repeated code
+- Add option to read in old files of hands played and augment the new hands to
+  those files for all the computational stuff or use just the new hands
