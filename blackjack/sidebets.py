@@ -3,6 +3,8 @@ Functions for determining if a player wins a side bet
 Checks poker hands and in between bets
 """
 
+from utils import *
+
 
 def royal_flush(hand):
     """
