@@ -9,7 +9,7 @@ from utils import *
 
 class Game(object):
 
-    def __init__(self, decks, players, num_hands):
+    def __init__(self):
         """
 
         Parameters
@@ -18,13 +18,12 @@ class Game(object):
         players: number of players
         """
         # Parameters needed to play game
-        self.num_decks = decks
-        self.deck = Deck(self.num_decks)
-        self.deck.shuffle()
-        self.cut = len(self.deck) * 0.25
+        self.num_decks = None
+        self.deck = None
+        self.cut = None
         self.card_count = 0
-        self.players = players
-        self.num_hands = num_hands
+        self.players = None
+        self.num_hands = None
         self.hands_played = 0
 
         # Player lists used in the game
@@ -592,13 +591,27 @@ class Game(object):
                               self.num_decks, player['pos'], self.players,
                               player['result'])
 
-    def play_game(self):
+    def sim_game(self, decks, players, num_hands):
         """
-        Play as many hands as specified
+        Simulates the specified number of blackjack hands
+
+        Parameters
+        ----------
+        decks: Number of decks to use
+        players: Number of players playing
+        num_hands: Number of hands to be simulated
+
         Returns
         -------
 
         """
+        # Parameters needed to play game
+        self.num_decks = decks
+        self.deck = Deck(self.num_decks)
+        self.deck.shuffle()
+        self.cut = len(self.deck) * 0.25
+        self.players = players
+        self.num_hands = num_hands
         print 'Playing Game'
         for i in range(self.num_hands):
             self.play_round()

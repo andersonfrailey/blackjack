@@ -30,6 +30,13 @@ class Data(object):
                              'taken': [], 'decks': [], 'seat': [],
                              'players': [], 'result': []}
 
+        # DataFrames for each element
+        self.card_freq_df = None
+        self.side_df = None
+        self.hit_df = None
+        self.insurance_df = None
+        self.results_df = None
+
     def card_freq(self, card, count, players, hands, decks):
         """
         Track how many times a card value appears, what the count is when it
@@ -81,6 +88,19 @@ class Data(object):
         self.side_dict['inbtwn'].append(inbtwn)
         self.side_dict['count'].append(count)
         self.side_dict['decks'].append(decks)
+
+    def convert(self):
+        """
+        Convert all dictionaries to DataFrames
+        Returns
+        -------
+
+        """
+        self.card_freq_df = pd.DataFrame(self.card_freq_dict)
+        self.side_df = pd.DataFrame(self.side_dict)
+        self.hit_df = pd.DataFrame(self.hit_dict)
+        self.insurance_df = pd.DataFrame(self.insurance_dict)
+        self.results_df = pd.DataFrame(self.results_dict)
 
     def hit_result(self, start_total, end_total, count, decks):
         """
