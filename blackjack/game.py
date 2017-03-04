@@ -11,11 +11,6 @@ class Game(object):
 
     def __init__(self):
         """
-
-        Parameters
-        ----------
-        decks: Number of decks
-        players: number of players
         """
         # Parameters needed to play game
         self.num_decks = None
