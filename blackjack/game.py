@@ -9,7 +9,7 @@ from utils import *
 
 class Game(object):
 
-    def __init__(self, decks, players, num_hands):
+    def __init__(self):
         """
 
         Parameters
@@ -18,13 +18,13 @@ class Game(object):
         players: number of players
         """
         # Parameters needed to play game
-        self.num_decks = decks
-        self.deck = Deck(self.num_decks)
-        self.deck.shuffle()
-        self.cut = len(self.deck) * 0.25
+        self.num_decks = None
+        self.deck = None
+        self.cut = None
         self.card_count = 0
-        self.players = players
-        self.num_hands = num_hands
+        self.players = None
+        self.num_hands = None
+        self.hands_played = 0
 
         # Player lists used in the game
         self.players_list = []
@@ -132,6 +132,8 @@ class Game(object):
         """
         card = self.deck.deal()
         start_count = self.card_count
+        self.data.card_freq(card, self.card_count, self.players,
+                            self.hands_played, self.num_decks)
         self.count(card)
         start = hand['total']
         if self.check_ace(card):
@@ -149,8 +151,7 @@ class Game(object):
         if hand['total'] > 21 and hand['soft'] and hand['ace val'] == 11:
             hand['total'] -= 10
             hand['ace val'] = 1
-        # TODO: feed start and end totals into utils
-        self.data.hit_result(start, hand['total'], start_count)
+        self.data.hit_result(start, hand['total'], start_count, self.num_decks)
         return self.bust(hand)
 
     def check_blackjack(self, hand):
@@ -182,7 +183,7 @@ class Game(object):
         else:
             return False
 
-    def split_logic(self, card):
+    def split_logic(self, card, pos):
         """
         Contains logic for creating a split hand
         Parameters
@@ -195,7 +196,8 @@ class Game(object):
 
         """
         # Create new hand to be returned
-        hand = {'total': 0, 'taken': 0, 'card one': card}
+        hand = {'total': 0, 'taken': 0, 'card one': card, 'bust': False,
+                'pos': pos}
         hand['soft'] = self.check_ace(card)
         if hand['soft']:
             hand['total'] = 11
@@ -203,6 +205,8 @@ class Game(object):
         else:
             hand['total'] = card.rank
         card_two = self.deck.deal()
+        self.data.card_freq(card_two, self.card_count, self.players,
+                            self.hands_played, self.num_decks)
         hand['card two'] = card_two
         self.count(card_two)
         ace = self.check_ace(card_two)
@@ -222,6 +226,7 @@ class Game(object):
             hand['split'] = True
         else:
             hand['split'] = False
+        hand['start'] = hand['total']
         return hand
 
     def split_hand(self, hand, d_up):
@@ -239,15 +244,15 @@ class Game(object):
         # Always split aces and eights
         if hand['card one'].rank == 14 or hand['card one'].rank == 8:
             # Create and play with two new hands
-            hand_one = self.split_logic(hand['card one'])
+            hand_one = self.split_logic(hand['card one'], hand['pos'])
             self.play_hand(hand_one, d_up)
-            hand_two = self.split_logic(hand['card two'])
+            hand_two = self.split_logic(hand['card two'], hand['pos'])
             self.play_hand(hand_two, d_up)
         elif hand['card one'].rank == 9:
             if not d_up == 7 and 10 <= d_up <= 14:
-                hand_one = self.split_logic(hand['card one'])
+                hand_one = self.split_logic(hand['card one'], hand['pos'])
                 self.play_hand(hand_one, d_up)
-                hand_two = self.split_logic(hand['card two'])
+                hand_two = self.split_logic(hand['card two'], hand['pos'])
                 self.play_hand(hand_two, d_up)
             else:
                 hand['split'] = False
@@ -255,18 +260,18 @@ class Game(object):
         elif (2 <= hand['card one'].rank <= 3 or
               6 <= hand['card one'].rank <= 7):
             if 2 <= d_up <= 7:
-                hand_one = self.split_logic(hand['card one'])
+                hand_one = self.split_logic(hand['card one'], hand['pos'])
                 self.play_hand(hand_one, d_up)
-                hand_two = self.split_logic(hand['card two'])
+                hand_two = self.split_logic(hand['card two'], hand['pos'])
                 self.play_hand(hand_two, d_up)
             else:
                 hand['split'] = False
                 self.play_hand(hand, d_up)
         elif hand['card one'].rank == 4:
             if 5 <= d_up <= 6:
-                hand_one = self.split_logic(hand['card one'])
+                hand_one = self.split_logic(hand['card one'], hand['pos'])
                 self.play_hand(hand_one, d_up)
-                hand_two = self.split_logic(hand['card two'])
+                hand_two = self.split_logic(hand['card two'], hand['pos'])
                 self.play_hand(hand_two, d_up)
             else:
                 hand['split'] = False
@@ -390,8 +395,10 @@ class Game(object):
 
         # Give each player and the dealer their first card
         for player in range(self.players):
-            player_dict = {'total': 0, 'pos': player}
+            player_dict = {'total': 0, 'pos': player, 'start': 0}
             card = self.deck.deal()
+            self.data.card_freq(card, self.card_count, self.players,
+                                self.hands_played, self.num_decks)
             self.count(card)
             player_dict['card one'] = card
             player_dict['soft'] = self.check_ace(card)
@@ -405,6 +412,8 @@ class Game(object):
             self.players_list.append(player_dict)
 
         card = self.deck.deal()
+        self.data.card_freq(card, self.card_count, self.players,
+                            self.hands_played, self.num_decks)
         self.count(card)
         self.dealer['card one'] = card
         self.dealer['soft'] = self.check_ace(card)
@@ -419,6 +428,8 @@ class Game(object):
         # Give each player and dealer a second card
         for player in self.players_list:
             card = self.deck.deal()
+            self.data.card_freq(card, self.card_count, self.players,
+                                self.hands_played, self.num_decks)
             self.count(card)
             player['card two'] = card
             ace = self.check_ace(card)
@@ -443,6 +454,8 @@ class Game(object):
 
         # Give dealer second card
         card = self.deck.deal()
+        self.data.card_freq(card, self.card_count, self.players,
+                            self.hands_played, self.num_decks)
         self.dealer['card two'] = card
         ace = self.check_ace(card)
         if ace and not self.dealer['soft']:
@@ -465,6 +478,8 @@ class Game(object):
         -------
 
         """
+        self.hands_played += 1
+        hand['start'] = hand['total']
         bust = False
         stand = False
         while not bust and not stand:
@@ -492,6 +507,12 @@ class Game(object):
         self.deal_hand()
         self.dealer['blackjack'] = self.check_blackjack(self.dealer)
         dealer_up = self.dealer['card one'].rank
+        # If the dealer has an ace showing, add blackjack result to data
+        if dealer_up == 14:
+            if self.dealer['blackjack']:
+                self.data.insurance(1, self.num_decks)
+            else:
+                self.data.insurance(0, self.num_decks)
         # Check all side bets and blackjack
         for hand in self.players_list:
             poker, inbtwn = side_bets(hand['card one'], hand['card two'],
@@ -499,6 +520,8 @@ class Game(object):
             hand['poker'] = poker
             hand['inbtwn'] = inbtwn
             hand['blackjack'] = self.check_blackjack(hand)
+            self.data.collect_side(poker, inbtwn, self.card_count,
+                                   self.num_decks)
         # Play each hand if dealer doesn't have blackjack
         if not self.dealer['blackjack']:
             for hand in self.players_list:
@@ -561,15 +584,34 @@ class Game(object):
                     player['result'] = 2
                 else:
                     player['result'] = 3
-        # TODO: add results to DataFrame in utils
+            # Add results to data
+            self.data.results(player['start'], player['total'],
+                              self.dealer['total'],
+                              self.dealer['card one'].rank, player['taken'],
+                              self.num_decks, player['pos'], self.players,
+                              player['result'])
 
-    def play_game(self):
+    def sim_game(self, decks, players, num_hands):
         """
-        Play as many hands as specified
+        Simulates the specified number of blackjack hands
+
+        Parameters
+        ----------
+        decks: Number of decks to use
+        players: Number of players playing
+        num_hands: Number of hands to be simulated
+
         Returns
         -------
 
         """
+        # Parameters needed to play game
+        self.num_decks = decks
+        self.deck = Deck(self.num_decks)
+        self.deck.shuffle()
+        self.cut = len(self.deck) * 0.25
+        self.players = players
+        self.num_hands = num_hands
         print 'Playing Game'
         for i in range(self.num_hands):
             self.play_round()
@@ -580,5 +622,4 @@ class Game(object):
                 if len(self.deck) != 52 * self.num_decks:
                     raise ValueError(msg)
                 self.card_count = 0
-            else:
-                continue
+                self.hands_played = 0
