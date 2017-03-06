@@ -618,3 +618,4 @@ class Game(object):
                     raise ValueError(msg)
                 self.card_count = 0
                 self.hands_played = 0
+        self.data.convert()
