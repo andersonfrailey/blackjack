@@ -4,6 +4,7 @@ Class to create and shuffle the deck and deal the cards
 
 from deck import Deck
 from sidebets import *
+from tqdm import tqdm
 from utils import *
 
 
@@ -607,8 +608,7 @@ class Game(object):
         self.cut = len(self.deck) * 0.25
         self.players = players
         self.num_hands = num_hands
-        print 'Playing Game'
-        for i in range(self.num_hands):
+        for i in tqdm(range(self.num_hands), desc='Playing Game'):
             self.play_round()
             if len(self.deck) < self.cut:
                 self.deck.create_deck()
