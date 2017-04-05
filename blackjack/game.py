@@ -606,6 +606,8 @@ class Game(object):
         self.deck = Deck(self.num_decks)
         self.deck.shuffle()
         self.cut = len(self.deck) * 0.25
+        if self.num_decks == 1:
+            self.cut == 24
         self.players = players
         self.num_hands = num_hands
         for i in tqdm(range(self.num_hands), desc='Playing Game'):
