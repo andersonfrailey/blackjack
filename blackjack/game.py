@@ -5,7 +5,7 @@ Class to create and shuffle the deck and deal the cards
 from deck import Deck
 from sidebets import *
 from tqdm import tqdm
-from utils import *
+from data import *
 
 
 class Game(object):
@@ -21,6 +21,7 @@ class Game(object):
         self.players = None
         self.num_hands = None
         self.hands_played = 0
+        self.max_hands = 1
 
         # Player lists used in the game
         self.players_list = []
@@ -498,6 +499,7 @@ class Game(object):
         -------
 
         """
+        round_count = self.card_count
         all_bust = True
         num_blackjacks = 0
         self.deal_hand()
@@ -539,16 +541,16 @@ class Game(object):
             self.dealer['bust'] = False
         # Call compare function to see which players won
         if not self.dealer['blackjack']:
-            self.compare(self.final_list)
+            self.compare(self.final_list, round_count)
         else:
-            self.compare(self.players_list)
+            self.compare(self.players_list, round_count)
         # Clear player and final lists after the round is complete.
         del self.players_list[:]
         del self.final_list[:]
         # Clear the dealer dictionary
         self.dealer = {'total': 0, 'soft': False, 'taken': 0}
 
-    def compare(self, players):
+    def compare(self, players, round_count):
         """
         Iterate through the player's and compare totals with the dealer
         Parameters
@@ -585,7 +587,7 @@ class Game(object):
                               self.dealer['total'],
                               self.dealer['card one'].rank, player['taken'],
                               self.num_decks, player['pos'], self.players,
-                              player['result'])
+                              player['result'], round_count)
 
     def sim_game(self, decks, players, num_hands):
         """
@@ -605,14 +607,27 @@ class Game(object):
         self.num_decks = decks
         self.deck = Deck(self.num_decks)
         self.deck.shuffle()
-        self.cut = len(self.deck) * 0.25
+        self.cut = len(self.deck) * 0.30
         if self.num_decks == 1:
-            self.cut == 24
+            self.cut == 26
         self.players = players
         self.num_hands = num_hands
+        # Set value for the maximum number of hands possible before new deck
+        if decks == 1:
+            # Play up to four hands with single deck and one or two players
+            if players <= 2:
+                self.max_hands = 4
+            # Only play one hand if single deck with more than two players
+            else:
+                self.max_hands = 1
+        # For all situations with multiple decks, play until you hit the cut
+        else:
+            self.max_hands = 9e99
         for i in tqdm(range(self.num_hands), desc='Playing Game'):
             self.play_round()
-            if len(self.deck) < self.cut:
+            # Set single_shuffle to handle single deck games
+            if (len(self.deck) <= self.cut or
+                    self.hands_played >= self.max_hands):
                 self.deck.create_deck()
                 self.deck.shuffle()
                 msg = 'Full deck not recreated'
