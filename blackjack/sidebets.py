@@ -26,9 +26,9 @@ def royal_flush(hand):
             royal = False
             break
     if royal:
-        return True, 'royal'
+        return True, 'Royal Flush'
     else:
-        return False, 'loss'
+        return False, 'Loss'
 
 
 def straight_flush(hand):
@@ -55,9 +55,9 @@ def straight_flush(hand):
             st_fl = False
             break
     if st_fl:
-        return True, 'straight flush'
+        return True, 'Straight Flush'
     else:
-        return False, 'loss'
+        return False, 'Loss'
 
 
 def flush(hand):
@@ -74,9 +74,9 @@ def flush(hand):
     """
     # See if all the suits are the same
     if hand[0].suit == hand[1].suit and hand[1].suit == hand[2].suit:
-        return True, 'flush'
+        return True, 'Flush'
     else:
-        return False, 'loss'
+        return False, 'Loss'
 
 
 def straight(hand):
@@ -101,9 +101,9 @@ def straight(hand):
             st = False
             break
     if st:
-        return True, 'straight'
+        return True, 'Straight'
     else:
-        return False, 'loss'
+        return False, 'Loss'
 
 
 def three(hand):
@@ -120,9 +120,9 @@ def three(hand):
     """
     # Check if all ranks are equal
     if hand[0].rank == hand[1].rank and hand[1].rank == hand[2].rank:
-        return True, 'three'
+        return True, 'Three of a Kind'
     else:
-        return False, 'loss'
+        return False, 'Loss'
 
 
 def poker_hands(hand):
@@ -177,7 +177,7 @@ def spread(card_one, card_two, dealer):
     sp = max([first, second])
     # If the spread is greater than four, only return four
     if sp >= 4:
-        return 4
+        return '4+'
     else:
         return sp
 
@@ -200,7 +200,7 @@ def in_between(card_one, card_two, dealer):
     if card_one.rank >= dealer.rank >= card_two.rank:
         return spread(card_one, card_two, dealer)
     else:
-        return 5
+        return 'Loss'
 
 
 def side_bets(card_one, card_two, dealer):
