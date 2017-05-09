@@ -1,5 +1,5 @@
 # Blackjack Simulator
-This repo currently only contains a blackjack simulator. An example of how to use the simulator can be found in the sample notebook.
+This repo currently only contains a blackjack simulator. An example of how to use the simulator can be found in the [sample notebook](https://nbviewer.jupyter.org/github/andersonfrailey/blackjack/blob/master/Sample%20Notebook.ipynb).
 
 Data from the simulations is not saved anywhere, but the scripts can be easily edited for that purpose.
 
