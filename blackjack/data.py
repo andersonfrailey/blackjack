@@ -19,7 +19,8 @@ class Data(object):
         self.side_dict = {'poker': [], 'inbtwn': [], 'count': [], 'decks': []}
 
         # Dictionary for hit results
-        self.hit_dict = {'start': [], 'end': [], 'count': [], 'decks': []}
+        self.hit_dict = {'start': [], 'end': [], 'soft': [], 'count': [],
+                         'decks': []}
 
         # Dictionary for tracking number of times dealer has blackjack
         self.insurance_dict = {'blackjack': [], 'decks': []}
@@ -101,13 +102,14 @@ class Data(object):
         self.insurance_df = pd.DataFrame(self.insurance_dict)
         self.results_df = pd.DataFrame(self.results_dict)
 
-    def hit_result(self, start_total, end_total, count, decks):
+    def hit_result(self, start_total, end_total, soft, count, decks):
         """
         Contains the result of a hit
         Parameters
         ----------
         start_total: total before hit
         end_total: total after hitting
+        soft: indicator of soft hand
         count: deck count when taking a hit
         decks: Number of decks in play
 
@@ -118,6 +120,7 @@ class Data(object):
         # Add data to hit result dictionaries
         self.hit_dict['start'].append(start_total)
         self.hit_dict['end'].append(end_total)
+        self.hit_dict['soft'].append(soft)
         self.hit_dict['count'].append(count)
         self.hit_dict['decks'].append(decks)
 

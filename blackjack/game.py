@@ -148,7 +148,8 @@ class Game(object):
         if hand['total'] > 21 and hand['soft'] and hand['ace val'] == 11:
             hand['total'] -= 10
             hand['ace val'] = 1
-        self.data.hit_result(start, hand['total'], start_count, self.num_decks)
+        self.data.hit_result(start, hand['total'], hand['soft'],
+                             start_count, self.num_decks)
         return self.bust(hand)
 
     def check_blackjack(self, hand):
