@@ -1,0 +1,144 @@
+{
+    "soft_stand": {
+        "title": "Dealer stands on a soft value",
+        "description": "Whether or not the dealer must stand when they reach their stand threshold with a soft hand",
+        "notes": "",
+        "section_1": "Game",
+        "section_2": "Dealer",
+        "type": "bool",
+        "number_dims": 0,
+        "value": [{"value": true}],
+        "validators": {
+            "choice": {
+                "choices": [true, false]
+            }
+        }
+    },
+    "stand_total": {
+        "title": "Dealer Stands on",
+        "description": "The dealer must stand when their hand reaches this total or higher",
+        "notes": "",
+        "section_1": "Game",
+        "section_2": "Dealer",
+        "type": "int",
+        "number_dims": 0,
+        "value": [{"value": 17}],
+        "validators": {
+            "range": {
+                "min": 3,
+                "max": 21
+            }
+        }
+    },
+    "double_after_split": {
+        "title": "Player can double down after spliting a pair",
+        "description": "Whether or not a player can double down after they split a pair",
+        "notes": "",
+        "section_1": "Game",
+        "section_2": "Player",
+        "type": "bool",
+        "number_dims": 0,
+        "value": [{"value": true}],
+        "validators": {
+            "choice": {
+                "choices": [true, false]
+            }
+        }
+    },
+    "blackjack_payout": {
+        "title": "Payout for a blackjack",
+        "description": "Multiplicative payout for a blackjack",
+        "notes": "",
+        "section_1": "Game",
+        "section_2": "Payout",
+        "type": "float",
+        "number_dims": 0,
+        "value": [{"value": 1.5}],
+        "validators": {
+            "range": {
+                "min": 0,
+                "max": 9e+99
+            }
+        }
+    },
+    "num_decks": {
+        "title": "Number of decks",
+        "description": "Number of decks used in the game",
+        "notes": "",
+        "section_1": "Game",
+        "section_2": "Deck",
+        "type": "int",
+        "number_dims": 0,
+        "value": [{"value": 8}],
+        "validators": {
+            "range": {
+                "min": 1,
+                "max": 9e+99
+            }
+        }
+    },
+    "shuffle_freq": {
+        "title": "Shuffle frequency",
+        "description": "The deck is shuffled every _ hands",
+        "notes": "If this value is less than one, the deck will be shuffled when less than that percent of the deck remains",
+        "section_1": "Game",
+        "section_2": "Deck",
+        "type": "float",
+        "number_dims": 0,
+        "value": [{"value": 4}],
+        "validators": {
+            "range": {
+                "min": 0,
+                "max": 9e+99
+            }
+        }
+    },
+    "min_bet": {
+        "title": "Minimum Bet",
+        "description": "Minimum bet required",
+        "notes": "",
+        "section_1": "Game",
+        "section_2": "Betting",
+        "type": "int",
+        "number_dims": 0,
+        "value": [{"value": 5}],
+        "validators": {
+            "range": {
+                "min": 0,
+                "max": 9e+99
+            }
+        }
+    },
+    "max_bet": {
+        "title": "Maximum bet",
+        "description": "Maximum bet allowed",
+        "notes": "",
+        "section_1": "Game",
+        "section_2": "Betting",
+        "type": "int",
+        "number_dims": 0,
+        "value": [{"value": 500}],
+        "validators": {
+            "range": {
+                "min": 0,
+                "max": 9e+99
+            }
+        }
+    },
+    "max_players": {
+        "title": "Maximum number of players",
+        "description": "Maximum number of players allowed in a game",
+        "notes": "",
+        "section_1": "Game",
+        "section_2": "Misc",
+        "type": "int",
+        "number_dims": 0,
+        "value": [{"value": 10}],
+        "validators": {
+            "range": {
+                "min": 1,
+                "max": 9e+99
+            }
+        }
+    }
+}
