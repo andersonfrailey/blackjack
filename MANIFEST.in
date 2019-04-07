@@ -1,0 +1,2 @@
+include blackjack/rules.json
+include blackjack/schema.json

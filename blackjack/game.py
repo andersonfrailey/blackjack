@@ -1,639 +1,251 @@
+""""
+The Game class is used to handle all of the logistics of the game including
+dealing the cards, playing the players hands, and playing the dealer
 """
-Class to create and shuffle the deck and deal the cards
-"""
-
-from deck import Deck
-from sidebets import *
+import os
+from .deck import Deck
+from .hand import Hand
+from paramtools.parameters import Parameters
 from tqdm import tqdm
-from data import *
 
 
-class Game(object):
+CUR_PATH = os.path.abspath(os.path.dirname(__file__))
 
-    def __init__(self):
+
+class GameParams(Parameters):
+    schema = os.path.join(CUR_PATH, "schema.json")
+    defaults = os.path.join(CUR_PATH, "rules.json")
+    array_first = True
+
+
+class Game:
+
+    def __init__(self, num_decks, players, rules=None, verbose=False):
         """
-        """
-        # Parameters needed to play game
-        self.num_decks = None
-        self.deck = None
-        self.cut = None
-        self.card_count = 0
-        self.players = None
-        self.num_hands = None
-        self.hands_played = 0
-        self.max_hands = 1
-
-        # Player lists used in the game
-        self.players_list = []
-        self.final_list = []
-
-        # Initiate the dealer
-        self.dealer = {'total': 0, 'soft': False, 'taken': 0}
-
-        # Initiate data collection
-        self.data = Data()
-
-    @staticmethod
-    def check_ace(card):
-        """
-        Checks if a card is an ace or not
         Parameters
         ----------
-        card: Card object
-
-        Returns
-        -------
-        True if ace, false otherwise
-
+        num_decks: number of decks to play with.
+        rules: rules of the game regarding whether a dealer hits on soft 17
+            or not.
+        players: list of Python objects that are used to act as players in the
+            game.
+        rules: dictionary containing any rule updates
+        verbose: boolean indicator for whether or not output should be printed
+            as the game progresses
         """
-        if card.rank == 14:
-            return True
-        else:
-            return False
+        # game parameters
+        self.num_decks = num_decks
+        self.deck = Deck(num_decks)
+        self.count = 0
+        self.ten_count = 16 * num_decks
+        self.player_list = players
+        self.count = 0
+        self.num_players = len(players)
+        self.rules = rules
+        self.game_params = GameParams(array_first=True)
+        self.hands = []
+        # update rules for the game
+        if self.rules:
+            if not isinstance(self.rules, dict):
+                raise TypeError("'rules' must be a dictionary.")
+            self._update_params(self.rules)
+        self.verbose = verbose
 
-    @staticmethod
-    def check_face(card):
-        """
-        Check if card is a face card
-        Parameters
-        ----------
-        card
-
-        Returns
-        -------
-        True if face card, false otherwise
-
-        """
-        if 11 <= card.rank <= 13:
-            return True
-        else:
-            return False
-
-    @staticmethod
-    def face_card():
-        """
-        Returns 10 to replace value of a face card
-        """
-        return 10
-
-    def count(self, card):
-        """
-        Count cards
-        If the card value is between 2 and 6, add one to count
-        If the card value is 10 or an ace, subtract one to count
-        Otherwise, add nothing
-
-        Parameters
-        ----------
-        card: card object
-
-        Returns
-        -------
-        None
-
-        """
-        if 2 <= card.rank <= 6:
-            self.card_count += 1
-        elif card.rank >= 10:
-            self.card_count -= 1
-
-    @staticmethod
-    def bust(hand):
-        """
-        Determines if a player busted
-
-        Parameters
-        ----------
-        hand
-
-        Returns
-        -------
-
-        """
-        if hand['total'] > 21:
-            return True
-        else:
-            return False
-
-    def hit(self, hand):
-        """
-        Add one card to a hand
-
-        Parameters
-        ----------
-        hand
-
-        Returns
-        -------
-
-        """
-        card = self.deck.deal()
-        start_count = self.card_count
-        self.data.card_freq(card, self.card_count, self.players,
-                            self.hands_played, self.num_decks)
-        self.count(card)
-        start = hand['total']
-        if self.check_ace(card):
-            if hand['total'] <= 10:
-                hand['total'] += 11
-                hand['ace val'] = 11
-            else:
-                hand['total'] += 1
-                hand['ace val'] = 1
-        elif self.check_face(card):
-            hand['total'] += self.face_card()
-        else:
-            hand['total'] += card.rank
-        hand['taken'] += 1
-        if hand['total'] > 21 and hand['soft'] and hand['ace val'] == 11:
-            hand['total'] -= 10
-            hand['ace val'] = 1
-        self.data.hit_result(start, hand['total'], hand['soft'],
-                             start_count, self.num_decks)
-        return self.bust(hand)
-
-    def check_blackjack(self, hand):
-        """
-        Check if player or dealer has blackjack
-
-        Parameters
-        ----------
-        hand
-
-        Returns
-        -------
-        True if player has blackjack, false otherwise
-
-        """
-        # If card one is of value ten check for an ace in card two
-        if 10 <= hand['card one'].rank <= 13:
-            if self.check_ace(hand['card two']):
-                return True
-            else:
-                return False
-        # If card one is an ace, check if card two is worth ten
-        elif self.check_ace(hand['card one']):
-            if 10 <= hand['card two'].rank <= 13:
-                return True
-            else:
-                return False
-        # If neither are the case, return false
-        else:
-            return False
-
-    def split_logic(self, card, pos):
-        """
-        Contains logic for creating a split hand
-        Parameters
-        ----------
-        card
-
-        Returns
-        -------
-        A complete hand
-
-        """
-        # Create new hand to be returned
-        hand = {'total': 0, 'taken': 0, 'card one': card, 'bust': False,
-                'pos': pos}
-        hand['soft'] = self.check_ace(card)
-        if hand['soft']:
-            hand['total'] = 11
-            hand['ace val'] = 11
-        else:
-            hand['total'] = card.rank
-        card_two = self.deck.deal()
-        self.data.card_freq(card_two, self.card_count, self.players,
-                            self.hands_played, self.num_decks)
-        hand['card two'] = card_two
-        self.count(card_two)
-        ace = self.check_ace(card_two)
-        if ace and not hand['soft']:
-            hand['soft'] = True
-            hand['total'] += 11
-            hand['ace val'] = 11
-        elif ace and hand['soft']:
-            hand['total'] += 1
-            hand['ace val'] = 1
-        elif self.check_face(card_two):
-            hand['total'] += 10
-        else:
-            hand['total'] += card_two.rank
-        # Check if hand can be split
-        if hand['card one'].rank == hand['card two'].rank:
-            hand['split'] = True
-        else:
-            hand['split'] = False
-        hand['start'] = hand['total']
-        return hand
-
-    def split_hand(self, hand, d_up):
-        """
-        Determines action to take based on card values and dealer up card
-        Parameters
-        ----------
-        hand: Player's cards and total
-        d_up: Dealer's up card
-
-        Returns
-        -------
-
-        """
-        # Always split aces and eights
-        if hand['card one'].rank == 14 or hand['card one'].rank == 8:
-            # Create and play with two new hands
-            hand_one = self.split_logic(hand['card one'], hand['pos'])
-            self.play_hand(hand_one, d_up)
-            hand_two = self.split_logic(hand['card two'], hand['pos'])
-            self.play_hand(hand_two, d_up)
-        elif hand['card one'].rank == 9:
-            if not d_up == 7 and 10 <= d_up <= 14:
-                hand_one = self.split_logic(hand['card one'], hand['pos'])
-                self.play_hand(hand_one, d_up)
-                hand_two = self.split_logic(hand['card two'], hand['pos'])
-                self.play_hand(hand_two, d_up)
-            else:
-                hand['split'] = False
-                self.play_hand(hand, d_up)
-        elif (2 <= hand['card one'].rank <= 3 or
-              6 <= hand['card one'].rank <= 7):
-            if 2 <= d_up <= 7:
-                hand_one = self.split_logic(hand['card one'], hand['pos'])
-                self.play_hand(hand_one, d_up)
-                hand_two = self.split_logic(hand['card two'], hand['pos'])
-                self.play_hand(hand_two, d_up)
-            else:
-                hand['split'] = False
-                self.play_hand(hand, d_up)
-        elif hand['card one'].rank == 4:
-            if 5 <= d_up <= 6:
-                hand_one = self.split_logic(hand['card one'], hand['pos'])
-                self.play_hand(hand_one, d_up)
-                hand_two = self.split_logic(hand['card two'], hand['pos'])
-                self.play_hand(hand_two, d_up)
-            else:
-                hand['split'] = False
-                self.play_hand(hand, d_up)
-        # Never split tens
-        else:
-            hand['split'] = False
-            self.play_hand(hand, d_up)
-
-    def hard_total(self, hand, d_up):
-        """
-        Determines which action to take based on player's hand total and the
-        dealer's up card
-
-        Parameters
-        ----------
-        hand: Player's cards and total
-        d_up: Dealer's up card
-
-        Returns
-        -------
-        Bust, Stand
-
-        """
-        # Always stand if total is above 17
-        if hand['total'] >= 17:
-            return False, True
-        elif 4 <= hand['total'] <= 8:
-            return self.hit(hand), False
-        elif 13 <= hand['total'] <= 16:
-            if 2 <= d_up <= 6:
-                return False, True
-            elif d_up >= 7:
-                return self.hit(hand), False
-        elif hand['total'] == 12:
-            if 4 <= d_up <= 6:
-                return False, True
-            else:
-                return self.hit(hand), False
-        elif hand['total'] == 11:
-            if 4 <= d_up <= 6:
-                return self.hit(hand), False
-            # When doubling down call hit and return stand as True
-            else:
-                return self.hit(hand), True
-        elif hand['total'] == 10:
-            if 10 <= d_up <= 14:
-                return self.hit(hand), False
-            else:
-                return self.hit(hand), True
-        elif hand['total'] == 9:
-            if 3 <= d_up <= 6:
-                return self.hit(hand), True
-            else:
-                return self.hit(hand), False
-        else:
-            return self.hit(hand), False
-
-    def soft_total(self, hand, d_up):
-        """
-        Logic for playing a soft hand
-        Parameters
-        ----------
-        hand
-        d_up
-
-        Returns
-        -------
-        bust, stand
-
-        """
-        if hand['total'] >= 19:
-            return False, True
-        elif hand['total'] == 18:
-            if 3 <= d_up <= 6:
-                return self.hit(hand), True
-            elif 9 < d_up < 14:
-                return self.hit(hand), False
-            else:
-                return False, True
-        elif hand['total'] == 17:
-            if 3 <= d_up <= 6:
-                return self.hit(hand), True
-            else:
-                return self.hit(hand), False
-        elif hand['total'] == 15 or hand['total'] == 16:
-            if 4 <= d_up <= 6:
-                return self.hit(hand), True
-            else:
-                return self.hit(hand), False
-        else:
-            if d_up == 5 or d_up == 6:
-                return self.hit(hand), True
-            else:
-                return self.hit(hand), False
-
-    def dealer_play(self, dealer):
-        """
-        Contains the dealer's strategy. Assumes dealer stands on soft 17
-
-        Returns
-        -------
-        Tuple where the first element is a boolean indicating if the dealer
-        busted and the second is a boolean indicating if the dealer is standing
-
-        """
-        if dealer['total'] >= 17:
-            return False, True
-        else:
-            return self.hit(dealer), False
-
-    def deal_hand(self):
-        """
-        Deal initial hands
-
-        Returns
-        -------
-        None
-
-        """
-
-        # Give each player and the dealer their first card
-        for player in range(self.players):
-            player_dict = {'total': 0, 'pos': player, 'start': 0}
-            card = self.deck.deal()
-            self.data.card_freq(card, self.card_count, self.players,
-                                self.hands_played, self.num_decks)
-            self.count(card)
-            player_dict['card one'] = card
-            player_dict['soft'] = self.check_ace(card)
-            if self.check_ace(card):
-                player_dict['total'] = 11
-                player_dict['ace val'] = 11
-            elif self.check_face(card):
-                player_dict['total'] += self.face_card()
-            else:
-                player_dict['total'] = card.rank
-            self.players_list.append(player_dict)
-
-        card = self.deck.deal()
-        self.data.card_freq(card, self.card_count, self.players,
-                            self.hands_played, self.num_decks)
-        self.count(card)
-        self.dealer['card one'] = card
-        self.dealer['soft'] = self.check_ace(card)
-        if self.dealer['soft']:
-            self.dealer['total'] = 11
-            self.dealer['ace val'] = 11
-        elif self.check_face(card):
-            self.dealer['total'] += self.face_card()
-        else:
-            self.dealer['total'] += card.rank
-
-        # Give each player and dealer a second card
-        for player in self.players_list:
-            card = self.deck.deal()
-            self.data.card_freq(card, self.card_count, self.players,
-                                self.hands_played, self.num_decks)
-            self.count(card)
-            player['card two'] = card
-            ace = self.check_ace(card)
-            if ace and not player['soft']:
-                player['soft'] = True
-                player['total'] += 11
-                player['ace val'] = 11
-            elif ace and player['soft']:
-                player['total'] += 1
-            elif self.check_face(card):
-                player['total'] += self.face_card()
-            else:
-                player['total'] += card.rank
-            # Check if a hand can be split
-            if player['card one'] == player['card two']:
-                player['split'] = True
-            else:
-                player['split'] = False
-            player['start'] = player['total']
-            player['taken'] = 0
-            player['bust'] = False
-
-        # Give dealer second card
-        card = self.deck.deal()
-        self.data.card_freq(card, self.card_count, self.players,
-                            self.hands_played, self.num_decks)
-        self.dealer['card two'] = card
-        ace = self.check_ace(card)
-        if ace and not self.dealer['soft']:
-            self.dealer['soft'] = True
-            self.dealer['total'] += 11
-            self.dealer['ace val'] = 11
-        elif ace:
-            self.dealer['total'] += 1
-        elif self.check_face(card):
-            self.dealer['total'] += self.face_card()
-        else:
-            self.dealer['total'] += card.rank
-        self.dealer['start'] = self.dealer['total']
-
-    def play_hand(self, hand, d_up):
-        """
-        Calls strategy functions
-        Appends each hand passed through to the final list
-        Returns
-        -------
-
-        """
-        self.hands_played += 1
-        hand['start'] = hand['total']
-        bust = False
-        stand = False
-        while not bust and not stand:
-            if hand['split']:
-                self.split_hand(hand, d_up)
-                break
-            elif not hand['soft'] and not hand['split']:
-                bust, stand = self.hard_total(hand, d_up)
-            elif hand['soft'] and not hand['split']:
-                bust, stand = self.soft_total(hand, d_up)
-        hand['bust'] = bust
-        if not hand['split']:
-            self.final_list.append(hand)
+        # burn first card
+        self.deck.deal()
 
     def play_round(self):
         """
-        Deal out all of the hands, then call play hand function with each hand
-        in player list
-        Returns
-        -------
-
+        Play a single round of blackjack
         """
-        round_count = self.card_count
-        all_bust = True
-        num_blackjacks = 0
-        self.deal_hand()
-        self.dealer['blackjack'] = self.check_blackjack(self.dealer)
-        dealer_up = self.dealer['card one'].rank
-        # If the dealer has an ace showing, add blackjack result to data
-        if dealer_up == 14:
-            if self.dealer['blackjack']:
-                self.data.insurance(1, self.num_decks)
-            else:
-                self.data.insurance(0, self.num_decks)
-        # Check all side bets and blackjack
-        for hand in self.players_list:
-            poker, inbtwn = side_bets(hand['card one'], hand['card two'],
-                                      self.dealer['card one'])
-            hand['poker'] = poker
-            hand['inbtwn'] = inbtwn
-            hand['blackjack'] = self.check_blackjack(hand)
-            self.data.collect_side(poker, inbtwn, self.card_count,
-                                   self.num_decks)
-        # Play each hand if dealer doesn't have blackjack
-        if not self.dealer['blackjack']:
-            for hand in self.players_list:
-                self.play_hand(hand, dealer_up)
-                if not hand['bust']:
-                    all_bust = False
-                if hand['blackjack']:
-                    num_blackjacks += 1
-        # Only count the dealer's second card after all players play
-        self.count(self.dealer['card two'])
-        # Only play the dealer's hand if at least one player didn't bust
-        if not all_bust and num_blackjacks != len(self.players_list):
-            d_bust = False
-            d_stand = False
-            while not d_bust and not d_stand:
-                d_bust, d_stand = self.dealer_play(self.dealer)
-            self.dealer['bust'] = d_bust
-        else:
-            self.dealer['bust'] = False
-        # Call compare function to see which players won
-        if not self.dealer['blackjack']:
-            self.compare(self.final_list, round_count)
-        else:
-            self.compare(self.players_list, round_count)
-        # Clear player and final lists after the round is complete.
-        del self.players_list[:]
-        del self.final_list[:]
-        # Clear the dealer dictionary
-        self.dealer = {'total': 0, 'soft': False, 'taken': 0}
+        start_count = self.count
+        self.deck.hands_played += 1
+        hands = []  # holds all of the hands the players will play
+        # deal first card to all players
+        for player in self.player_list:
+            # skip any players without a high enough bankroll
+            if player.bankroll < self.game_params.min_bet:
+                continue
+            card_one = self.deck.deal()
+            self._count(card_one)
+            min_bet = self.game_params.min_bet
+            max_bet = self.game_params.max_bet
+            hands.append(Hand(card_one, player=player,
+                              min_bet=min_bet, max_bet=max_bet))
+        # deal to dealer
+        card = self.deck.deal()
+        self._count(card)
+        dealer = Hand(card)
+        dealer_up = dealer.card_one
+        # deal second card to all players
+        for hand in hands:
+            card_two = self.deck.deal()
+            self._count(card_two)
+            hand.add_card_two(card_two)
+        # deal second card to dealer, but don't count until later
+        dealer.add_card_two(self.deck.deal())
+        if self.verbose:
+            print(f"Dealer Up Card: {dealer.card_one}")
+            print(f"Player Hands:")
+            for hand in hands:
+                print(f"{hand.cards[0]}{hand.cards[1]}")
+            if dealer.blackjack:
+                print("Dealer Blackjack")
+        # check for dealer blackjack
+        # play only if the dealer doesn't have blackjack
+        if not dealer.blackjack:
+            # play each hand
+            num_busts_splits_blackjacks = 0
+            for hand in hands:
+                # if the new hand is from a split, add a second card before
+                # playing
+                if hand.from_split:
+                    card = self.deck.deal()
+                    self._count(card)
+                    hand.add_card_two(card)
+                if hand.blackjack:
+                    num_busts_splits_blackjacks += 1
+                if self.verbose:
+                    print(f"{hand.cards[0]}{hands.card[1]}")
+                while not hand.stand and not hand.bust:
+                    action = hand.player.action(hand, dealer_up,
+                                                start_count=start_count)
+                    if self.verbose:
+                        print(f"Player action: {action}")
+                    if action == "STAND":
+                        setattr(hand, "stand", True)
+                        continue
+                    elif action == "SPLIT":
+                        # only allow split if the card ranks are equal and they
+                        # only have two cards
+                        allowed = (hand.card_one == hand.cards[1] and
+                                   len(hand.cards) == 2)
+                        if not allowed:
+                            action = "HIT"
+                        else:
+                            # create two new hands using original two cards
+                            hand_one_card = hand.card_one
+                            hand_two_card = hand.cards[1]
+                            hand_one = Hand(hand_one_card, from_split=True,
+                                            player=hand.player)
+                            hand_two = Hand(hand_two_card, from_split=True,
+                                            player=hand.player)
+                            hands.insert(hands.index(hand) + 1, hand_one)
+                            hands.insert(hands.index(hand) + 2, hand_two)
+                            # flag the hand as split
+                            setattr(hand, "split", True)
+                            num_busts_splits_blackjacks += 1
+                            continue
+                    elif action == "DOUBLE":
+                        # can only double in your first move
+                        allowed = len(hand.cards) == 2
+                        # not all games allow you to double split hands
+                        if hand.from_split:
+                            allowed = self.game_params.double_after_split
+                        # if allowed, you must stand after doubling down
+                        if allowed:
+                            setattr(hand, "stand", True)
+                        # whether or not the double is allowed, the player will
+                        # add a card
+                        action = "HIT"
+                    if action == "HIT":
+                        card = self.deck.deal()
+                        self._count(card)
+                        hand.add_card(card)
+                        if self.verbose:
+                            print(f"Card Received: {card}")
+                            print(f"New Total: {hand.total}")
+                    if hand.bust:
+                        num_busts_splits_blackjacks += 1
 
-    def compare(self, players, round_count):
-        """
-        Iterate through the player's and compare totals with the dealer
-        Parameters
-        ----------
-        players: The full list of hands played
-
-        Returns
-        -------
-        Gives a value to player['result']:
-        0 if player busts
-        1 if player wins
-        2 if player loses, but doesn't bust
-        3 if push
-        4 if player wins and dealer busts
-        5 if dealer has blackjack
-
-        """
-        for player in players:
-            if self.dealer['blackjack']:
-                player['result'] = 5
-            elif self.dealer['bust'] and not player['bust']:
-                player['result'] = 4
-            elif player['bust']:
-                player['result'] = 0
-            else:
-                if player['total'] > self.dealer['total']:
-                    player['result'] = 1
-                elif player['total'] < self.dealer['total']:
-                    player['result'] = 2
+            # count dealer's second card
+            self._count(dealer.cards[1])
+            if self.verbose:
+                print(f"Dealer Hand: {dealer.cards[0]} {dealer.cards[1]}")
+            # if needed, play the dealer
+            dealer_play = num_busts_splits_blackjacks != len(hands)
+            if dealer_play:
+                stand_total = self.game_params.stand_total
+                soft_stand = self.game_params.soft_stand
+                if dealer.total >= stand_total:
+                    # logic for determining if a dealer plays soft hands
+                    if dealer.total == stand_total and dealer.soft:
+                        dealer_stand = soft_stand
+                    else:
+                        dealer_stand = True
                 else:
-                    player['result'] = 3
-            # Add results to data
-            self.data.results(player['start'], player['total'],
-                              self.dealer['total'],
-                              self.dealer['card one'].rank, player['taken'],
-                              self.num_decks, player['pos'], self.players,
-                              player['result'], round_count)
+                    dealer_stand = False
+                while not dealer_stand and not dealer.bust:
+                    card = self.deck.deal()
+                    self._count(card)
+                    dealer.add_card(card)
+                    if self.verbose:
+                        print(f"Dealer Draws: {card}")
+                        print(f"New Dealer Total: {dealer.total}")
+                    if dealer.total >= stand_total:
+                        if dealer.total == stand_total and dealer.soft:
+                            dealer_stand = soft_stand
+                        else:
+                            dealer_stand = True
 
-    def sim_game(self, decks, players, num_hands):
+        self._compare(hands, dealer,
+                      self.game_params.blackjack_payout)
+        # check if the deck should be shuffled
+        burn = self.deck.check_status(self.game_params.shuffle_freq)
+        # burn first card
+        if burn:
+            self.deck.deal()
+
+    def simulate(self, rounds):
         """
-        Simulates the specified number of blackjack hands
-
-        Parameters
-        ----------
-        decks: Number of decks to use
-        players: Number of players playing
-        num_hands: Number of hands to be simulated
-
-        Returns
-        -------
-
+        Simulate a given number of hands of blackjack
         """
-        # Parameters needed to play game
-        self.num_decks = decks
-        self.deck = Deck(self.num_decks)
-        self.deck.shuffle()
-        self.cut = len(self.deck) * 0.30
-        if self.num_decks == 1:
-            self.cut == 26
-        self.players = players
-        self.num_hands = num_hands
-        # Set value for the maximum number of hands possible before new deck
-        if decks == 1:
-            # Play up to four hands with single deck and one or two players
-            if players <= 2:
-                self.max_hands = 4
-            # Only play one hand if single deck with more than two players
-            else:
-                self.max_hands = 1
-        # For all situations with multiple decks, play until you hit the cut
-        else:
-            self.max_hands = 9e99
-        for i in tqdm(range(self.num_hands), desc='Playing Game'):
+        for i in tqdm(range(rounds)):
             self.play_round()
-            # Set single_shuffle to handle single deck games
-            if (len(self.deck) <= self.cut or
-                    self.hands_played >= self.max_hands):
-                self.deck.create_deck()
-                self.deck.shuffle()
-                msg = 'Full deck not recreated'
-                if len(self.deck) != 52 * self.num_decks:
-                    raise ValueError(msg)
-                self.card_count = 0
-                self.hands_played = 0
-        self.data.convert()
+
+    # Start private methods
+
+    def _update_params(self, rules):
+        """
+        Update the game parameters based on user input
+        """
+        self.game_params.adjust(rules)
+
+    def _compare(self, hands, dealer, blackjack_payout):
+        """
+        Function to compare the dealer to each hand in hands and settle up
+        """
+        for hand in hands:
+            # skip split hands
+            if hand.split:
+                continue
+            if self.verbose:
+                print(f"Player Total: {hand.total}")
+                print(f"Dealer Total: {dealer.total}")
+            if hand.bust:
+                hand.player.settle_up(hand.summary_data(), dealer.total,
+                                      "loss", blackjack_payout)
+            elif dealer.bust:
+                hand.player.settle_up(hand.summary_data(), dealer.total,
+                                      "win", blackjack_payout)
+            elif hand > dealer:
+                hand.player.settle_up(hand.summary_data(), dealer.total,
+                                      "win", blackjack_payout)
+            elif hand < dealer:
+                hand.player.settle_up(hand.summary_data(), dealer.total,
+                                      "loss", blackjack_payout)
+            else:
+                hand.player.settle_up(hand.summary_data(), dealer.total,
+                                      "push", blackjack_payout)
+            if self.verbose:
+                print(f"Player Bankroll: {hand.player.bankroll}")
+
+    def _count(self, card):
+        """
+        Count cards as they're delt
+        """
+        if 2 <= card.rank <= 6:
+            self.count += 1
+        elif card.rank >= 10:
+            self.count -= 1
+            self.ten_count -= 1
