@@ -260,6 +260,9 @@ class Game:
         """
         Update the game parameters based on user input
         """
+        for param in rules.keys():
+            val = rules[param]
+            rules[param] = [{"value": val}]
         self.game_params.adjust(rules)
 
     def _compare(self, hands, dealer, payout, blackjack_payout):

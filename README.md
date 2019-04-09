@@ -60,14 +60,14 @@ game.simulate(1000000)
 
 To update a rule in the game, use this dictionary format:
 
-`{param: [{"value": new_rule}]}`
+`{param: new_rule}`
 
 For example, here is how to change the blackjack payout from 3:2 to 6:5:
 
 ```python
 from blackjack import Game, Player
 
-rules = {"blackjack_payout": [{"value": 1.2}]}}
+rules = {"blackjack_payout": 1.2}
 
 player = Player(100)
 game = Game(1, [player], rules)
