@@ -43,7 +43,7 @@ class Hand:
         setattr(self, "total", self.cards[0] + self.cards[1])
         if self.cards[0].rank == 14 or self.cards[1].rank == 14:
             setattr(self, "soft", True)
-        setattr(self, "blackjack", self._check_blackjack())
+        self._check_blackjack()
 
     def add_card(self, card):
         """
@@ -77,13 +77,13 @@ class Hand:
             "card_one_rank": self.cards[0].rank,
             "card_two_rank": self.cards[1].rank,
             "cards": [card.rank for card in self.cards],
-            "soft": self.soft,
-            "from_split": self.from_split,
-            "blackjack": self.blackjack,
+            "soft": int(self.soft),
+            "from_split": int(self.from_split),
+            "blackjack": int(self.blackjack),
             "num_cards": len(self.cards),
             "start_total": self.cards[0] + self.cards[1],
             "wager": int(self.wager),
-            "insurance": self.insurance
+            "insurance": int(self.insurance)
         }
         return data
 

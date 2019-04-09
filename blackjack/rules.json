@@ -25,7 +25,7 @@
         "value": [{"value": 17}],
         "validators": {
             "range": {
-                "min": 3,
+                "min": 4,
                 "max": 21
             }
         }
@@ -45,6 +45,22 @@
             }
         }
     },
+    "payout": {
+        "title": "Payout for a winning hand",
+        "description": "Multiplicative payout for winning a hand",
+        "notes": "",
+        "section_1": "Game",
+        "section_2": "Payout",
+        "type": "float",
+        "number_dims": 0,
+        "value": [{"value": 1}],
+        "validators": {
+            "range": {
+                "min": 0,
+                "max": 9e+99
+            }
+        }
+    },
     "blackjack_payout": {
         "title": "Payout for a blackjack",
         "description": "Multiplicative payout for a blackjack",
@@ -61,22 +77,6 @@
             }
         }
     },
-    "num_decks": {
-        "title": "Number of decks",
-        "description": "Number of decks used in the game",
-        "notes": "",
-        "section_1": "Game",
-        "section_2": "Deck",
-        "type": "int",
-        "number_dims": 0,
-        "value": [{"value": 8}],
-        "validators": {
-            "range": {
-                "min": 1,
-                "max": 9e+99
-            }
-        }
-    },
     "shuffle_freq": {
         "title": "Shuffle frequency",
         "description": "The deck is shuffled every _ hands",
@@ -85,7 +85,7 @@
         "section_2": "Deck",
         "type": "float",
         "number_dims": 0,
-        "value": [{"value": 4}],
+        "value": [{"value": 0.25}],
         "validators": {
             "range": {
                 "min": 0,
@@ -105,7 +105,7 @@
         "validators": {
             "range": {
                 "min": 0,
-                "max": 9e+99
+                "max": "max_bet"
             }
         }
     },
@@ -120,7 +120,7 @@
         "value": [{"value": 500}],
         "validators": {
             "range": {
-                "min": 0,
+                "min": "min_bet",
                 "max": 9e+99
             }
         }
@@ -137,6 +137,53 @@
         "validators": {
             "range": {
                 "min": 1,
+                "max": 9e+99
+            }
+        }
+    },
+    "insurance_allowed": {
+        "title": "Whether or not a player is allowed to take insurance",
+        "description": "Boolean indicator for whether a player is allowed to buy insurance when the dealer shows an ace.",
+        "notes": "",
+        "section_1": "Game",
+        "section_2": "Insurance",
+        "type": "bool",
+        "number_dims": 0,
+        "value": [{"value": true}],
+        "validators": {
+            "choice": {
+                "choices": [true, false]
+            }
+        }
+    },
+    "insurance_pct": {
+        "title": "Percentage of original wager needed for insurance",
+        "description": "If a player chooses to take insurance, the wager is for this portion of their original bet.",
+        "notes": "",
+        "section_1": "Game",
+        "section_2": "Insurance",
+        "type": "float",
+        "number_dims": 0,
+        "value": [{"value": 0.5}],
+        "validators": {
+            "range": {
+                "min": 0,
+                "max": 1
+            }
+        }
+    },
+    "insurance_payout": {
+        "title": "Payout on insurance",
+        "description": "If the player purchases insurance and the dealer has blackjack, this will be the payout.",
+        "notes": "",
+        "section_1": "Game",
+        "section_2": "Insurance",
+        "type": "float",
+        "number_dims": 0,
+        "value": [{"value": 1}],
+        "validators": {
+            "range": {
+                "min": 0,
                 "max": 9e+99
             }
         }
