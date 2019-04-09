@@ -188,9 +188,13 @@ class Game:
                                     "round_id": self.round_id,
                                     "hand_id": hand_id}
                         card = self.deck.deal()
+                        hit_data["card_received_rank"] = card.rank
                         self._count(card)
                         hand.add_card(card)
                         hit_data["new_total"] = hand.total
+                        card_received_value = (hit_data["new_total"] -
+                                               hit_data["start_total"])
+                        hit_data["card_received_value"] = card_received_value
                         self.hit_results.append(hit_data)
                         if self.verbose:
                             print(f"Card Received: {card}")
@@ -271,7 +275,8 @@ class Game:
         """
         additional_data = {
             "round_id": self.round_id,
-            "dealer_blackjack": int(dealer.blackjack)
+            "dealer_blackjack": int(dealer.blackjack),
+            "dealer_up": dealer.card_one.value
         }
         for hand in hands:
             hand_data = {**hand.summary_data(), **additional_data}
@@ -283,16 +288,16 @@ class Game:
                 print(f"Player Total: {hand.total}")
                 print(f"Dealer Total: {dealer.total}")
             if hand.bust:
-                hand.player.settle_up(hand.summary_data(), dealer.total,
+                hand.player.settle_up(hand_data, dealer.total,
                                       "loss", payout, blackjack_payout)
             elif dealer.bust:
-                hand.player.settle_up(hand.summary_data(), dealer.total,
+                hand.player.settle_up(hand_data, dealer.total,
                                       "win", payout, blackjack_payout)
             elif hand > dealer:
-                hand.player.settle_up(hand.summary_data(), dealer.total,
+                hand.player.settle_up(hand_data, dealer.total,
                                       "win", payout, blackjack_payout)
             elif hand < dealer:
-                hand.player.settle_up(hand.summary_data(), dealer.total,
+                hand.player.settle_up(hand_data, dealer.total,
                                       "loss", payout, blackjack_payout)
             else:
                 if self.verbose:

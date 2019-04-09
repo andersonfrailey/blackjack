@@ -95,13 +95,14 @@ class Player:
         -------
         None
         """
+        wager = hand_data["wager"]
         additonal_data = {
             "dealer_total": dealer_total,
-            "start_bankroll": self.bankroll,
+            # add back initial wager to get starting bankroll
+            "start_bankroll": self.bankroll + wager,
             "result": result
         }
         # adjust bankroll according to result
-        wager = hand_data["wager"]
         if result == "win":
             if hand_data["blackjack"]:
                 payout = wager + (wager * blackjack_payout)
