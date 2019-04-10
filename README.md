@@ -4,13 +4,19 @@
 default rules or specify their own. Additionally, users can test their own
 playing and betting strategies.
 
+## Installation
+
+Right now `blackjack` can only be installed from source. Clone or download this
+repository, then navigate to the directory you cloned to and run
+`pip install -e .`.
+
 ## Using `blackjack`
 
 To run the simulator, the user must initiate one instance of the `Game` class
 and at least one instance of the `Player` class.
 
-The `Player` class requires one input, `bankroll`, and has two optional inputs,
-`strategy_func` and `wager_func`.
+The `Player` class requires one input, `bankroll`, and has three optional inputs:
+`strategy_func`, `wager_func`, and `insurance_func`.
 `bankroll` should be an numerical value indicating the bankroll
 the player will be starting with.
 
@@ -21,7 +27,12 @@ such as the player's hand, dealer's up card, and the count.
 
 `wager_func` should be a function that will determine how much the player will
 wager in a hand. Like the function used for `strategy_func` it can take as
-arguments variables on the status of the game.
+arguments variables on the status of the game. It must return a number that is
+within the minimum and maximum bets allowed, and no more than the player's
+bankroll.
+
+`insurance_func` should be a function that will determine if a player takes
+insurance when the dealer is showing an ace. It must return `True` or `False`.
 
 The `Game` class has two required arguments and two optional ones. `num_decks`
 is an integer for the number of decks used in the game, `players` is a list of
@@ -49,17 +60,88 @@ game.simulate(1000000)
 
 To update a rule in the game, use this dictionary format:
 
-`{param: [{"value": new_rule}]}`
+`{param: new_rule}`
 
 For example, here is how to change the blackjack payout from 3:2 to 6:5:
 
 ```python
 from blackjack import Game, Player
 
-rules = {"blackjack_payout": [{"value": 1.2}]}}
+rules = {"blackjack_payout": 1.2}
 
 player = Player(100)
 game = Game(1, [player], rules)
 
 game.simulate(1000000)
 ```
+
+### Parameters currently available to be modified:
+
+#### `soft_stand`
+
+Whether or not the dealer must stand on a soft total.
+Default value: True
+Possible values: True, False
+
+#### `stand_total`
+
+Hand value the dealer must reach before they can stand.
+Default value: 17
+Possible values: 4-21
+
+#### `double_after_split`
+
+Whether or not a player can double down after splitting a pair.
+Default value: True
+Possible values: True, False
+
+#### `payout`
+
+Payout for a winning hand.
+Default value: 1 (1:1)
+Possible values: 0-9e99
+
+#### `blackjack_payout`
+
+Total payout if the player has blackjack.
+Default value: 1.5 (3/2)
+Possible values: 0-9e99 (infinity)
+
+#### `shuffle_freq`
+
+How often the deck is shuffled. If this value is greater than one, the deck
+will be shuffled after that many hands are played. If it is less than one, the
+deck will be shuffled when that percentage of the deck is left.
+Default value: 4
+Possible values: 0-9e99 (note: if the shuffle frequency is too low, an
+error will be raised when the deck runs out of cards)
+
+#### `min_bet`
+
+Minimum bet required.
+Default value: 5
+Possible Values: 0-`max_bet
+
+#### `max_bet`
+
+Maximum bet allowed.
+Default value: 500
+Possible values: `min_bet`-9e99
+
+#### `max_players`
+
+Maximum number of players allowed in a game.
+Default value: 10
+Possible values: 1-9e99
+
+#### `insurance_allowed`
+
+Whether or not a player is allowed to take insurance when the dealer shoes an ace.
+Default value: True
+Possible values: True, False
+
+#### `insurance_pct`
+
+What share of a player's original bet they must pay to purchase insurance.
+Default value: 0.5
+Possible values: 0-1
