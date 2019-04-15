@@ -202,5 +202,21 @@
                 "choices": [true, false]
             }
         }
+    },
+    "num_decks": {
+        "title": "Number of decks the game will be played with",
+        "description": "Number of decks used in the game.",
+        "notes": "",
+        "section_1": "Game",
+        "section_2": "Deck",
+        "type": "int",
+        "number_dims": 0,
+        "value": [{"value": 8}],
+        "validators": {
+            "range": {
+                "min": 1,
+                "max": 9e+99
+            }
+        }
     }
 }

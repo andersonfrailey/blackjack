@@ -34,13 +34,13 @@ bankroll.
 `insurance_func` should be a function that will determine if a player takes
 insurance when the dealer is showing an ace. It must return `True` or `False`.
 
-The `Game` class has two required arguments and two optional ones. `num_decks`
-is an integer for the number of decks used in the game, `players` is a list of
-instances of the `Players` class that will be used in the game. `rules` can be
-a dictionary containing changes to the game's default rules to run the simulation
-under different scenarios. An explanation of how the dictionary should be
-structured is below. Finally, `verbose` is a boolean indicator for whether or
-not you want information printed out as the game is played.
+The `Game` class has one required argument and two optional ones. `players`
+is a list of instances of the `Players` class that will be used in the game.
+`rules` can be a dictionary containing changes to the game's default rules to
+run the simulation under different scenarios. An explanation of how the
+dictionary should be structured is below. Finally, `verbose` is a boolean
+indicator for whether or not you want information printed out as the game is
+played.
 
 Running a simulation can be done in a few lines of code:
 
@@ -50,7 +50,7 @@ from blackjack import Game, Player
 # initiate Player object
 player = Player(100)
 # initiate Game object
-game = Game(1, [player])
+game = Game([player])
 
 # run simulation 1,000,000 times
 game.simulate(1000000)
@@ -70,7 +70,7 @@ from blackjack import Game, Player
 rules = {"blackjack_payout": 1.2}
 
 player = Player(100)
-game = Game(1, [player], rules)
+game = Game([player], rules)
 
 game.simulate(1000000)
 ```
