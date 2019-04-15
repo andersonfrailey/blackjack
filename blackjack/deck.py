@@ -10,8 +10,6 @@ class Deck:
         """
         Initialize Deck class and create the first deck
         """
-        if not isinstance(decks, int):
-            raise TypeError("'deck' must be an integer.")
         self.deck = []
         self.decks = decks
         self.num_creates = 0

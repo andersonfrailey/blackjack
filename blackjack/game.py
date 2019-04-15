@@ -2,6 +2,7 @@
 The Game class is used to handle all of the logistics of the game including
 dealing the cards, playing the players hands, and playing the dealer
 """
+import copy
 import os
 from .deck import Deck
 from .hand import Hand
@@ -20,7 +21,7 @@ class GameParams(Parameters):
 
 class Game:
 
-    def __init__(self, num_decks, players, rules=None, verbose=False):
+    def __init__(self, players, rules=None, verbose=False):
         """
         Parameters
         ----------
@@ -34,22 +35,23 @@ class Game:
             as the game progresses
         """
         # game parameters
-        self.num_decks = num_decks
-        self.deck = Deck(num_decks)
-        self.count = 0
-        self.ten_count = 16 * num_decks  # count of tens seen
-        self.other_count = 36 * num_decks  # count of non-tens seens
-        self.player_list = players
-        self.count = 0
-        self.num_players = len(players)
-        self.rules = rules
+        # make a copy of rules to avoid modifying the original dictionary
+        self.rules = copy.deepcopy(rules)
         self.game_params = GameParams(array_first=True)
         # update rules for the game
         if self.rules:
             if not isinstance(self.rules, dict):
                 raise TypeError("'rules' must be a dictionary.")
             self._update_params(self.rules)
-        assert 1 <= len(self.player_list) <= self.game_params.max_players
+        self.num_decks = self.game_params.num_decks
+        self.deck = Deck(self.num_decks)
+        self.count = 0
+        self.ten_count = 16 * self.num_decks  # count of tens seen
+        self.other_count = 36 * self.num_decks  # count of non-tens seens
+        self.player_list = players
+        self.count = 0
+        self.num_players = len(players)
+        assert 1 <= self.num_players <= self.game_params.max_players
         self.verbose = verbose
 
         # variables for data collection

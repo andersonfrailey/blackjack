@@ -6,8 +6,6 @@ from blackjack import Card, Deck
 
 
 def test_deck():
-    with pytest.raises(TypeError):
-        Deck("one")
     deck = Deck(3)
     assert len(deck) == 52 * 3
     while deck:
