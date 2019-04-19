@@ -46,22 +46,22 @@ class Card:
         return str(rank) + suit_symobols[self.suit]
 
     def __eq__(self, other):
-        return self.rank == other.rank
+        return self.value == other.value
 
     def __ne__(self, other):
-        return self.rank != other.rank
+        return self.value != other.value
 
     def __lt__(self, other):
-        return self.rank < other.rank
+        return self.value < other.value
 
     def __le__(self, other):
-        return self.rank <= other.rank
+        return self.value <= other.value
 
     def __gt__(self, other):
-        return self.rank > other.rank
+        return self.value > other.value
 
     def __ge__(self, other):
-        return self.rank >= other.rank
+        return self.value >= other.value
 
     def __add__(self, other):
         if isinstance(other, Card):

@@ -1,31 +1,7 @@
 """
 Definition of the player class
 """
-
-
-def default_wager(player, min_bet, max_bet, **kwargs):
-    """
-    Function to serve as the default wager function if user doesn't input
-    their own
-    """
-    return min_bet
-
-
-def default_action(player, hand, dealer_up, **kwargs):
-    """
-    Default function for determining player actions
-    """
-    if hand.total >= 17:
-        return "STAND"
-    else:
-        return "HIT"
-
-
-def default_insurance(player, **kwargs):
-    """
-    Default function for determining if a player takes insurance
-    """
-    return False
+from .strategies import hit_to_seventeen, minimum_bet, decline_insurance
 
 
 class Player:
@@ -43,15 +19,15 @@ class Player:
         # self.strategy = strategy
         self.history = []  # holds hand history
         if not wager_func:
-            self.wager_func = default_wager
+            self.wager_func = minimum_bet
         else:
             self.wager_func = wager_func
         if not strategy_func:
-            self.strategy_func = default_action
+            self.strategy_func = hit_to_seventeen
         else:
             self.strategy_func = strategy_func
         if not insurance_func:
-            self.insurance_func = default_insurance
+            self.insurance_func = decline_insurance
         else:
             self.insurance_func = insurance_func
 
@@ -63,8 +39,12 @@ class Player:
         wager = self.wager_func(player=self, min_bet=min_bet, max_bet=max_bet,
                                 **kwargs)
         # assert that the bet is within table stakes and player can afford it
-        assert min_bet <= wager <= max_bet
-        assert wager <= self.bankroll
+        assert min_bet <= wager <= max_bet, (
+            f"{wager} not between min. bet {min_bet} and max bet {max_bet}"
+        )
+        assert wager <= self.bankroll, {
+            f"{wager} greater than bankroll {self.bankroll}"
+        }
         self.bankroll -= wager
         return wager
 

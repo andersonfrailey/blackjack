@@ -25,6 +25,7 @@ def test_add_card_two():
         hand.add_card_two("2C")
     card_two = Card(2, "D")
     hand.add_card_two(card_two)
+    assert hand.total == 5
 
 
 def test_comparisons():
@@ -37,3 +38,29 @@ def test_comparisons():
         hand < 3
     with pytest.raises(TypeError):
         hand == 3
+
+
+def test_blackjack():
+    hand = Hand(Card(14, "C"))
+    hand.add_card_two(Card(10, "D"))
+    assert hand.blackjack
+
+
+def test_soft():
+    hand = Hand(Card(14, "C"))
+    hand.add_card_two(Card(14, "D"))
+    assert not hand.soft
+
+    hand = Hand(Card(5, "D"))
+    hand.add_card_two(Card(14, "S"))
+    assert hand.soft
+
+    hand = Hand(Card(6, "H"))
+    hand.add_card_two(Card(3, "H"))
+    hand.add_card(Card(14, "H"))
+    assert hand.soft
+
+    hand = Hand(Card(14, "D"))
+    hand.add_card_two(Card(3, "H"))
+    hand.add_card(Card(10, "C"))
+    assert not hand.soft

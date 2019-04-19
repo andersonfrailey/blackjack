@@ -32,17 +32,13 @@ class Hand:
         self.blackjack = False
         self.from_split = from_split
         self.insurance = False
+        self.total = card_one.value
 
     def add_card_two(self, card):
         """
         Add second card to hand
         """
-        if not isinstance(card, Card):
-            raise TypeError("'card' must be a Card object")
-        self.cards.append(card)
-        setattr(self, "total", self.cards[0] + self.cards[1])
-        if self.cards[0].rank == 14 or self.cards[1].rank == 14:
-            setattr(self, "soft", True)
+        self.add_card(card)
         self._check_blackjack()
 
     def add_card(self, card):

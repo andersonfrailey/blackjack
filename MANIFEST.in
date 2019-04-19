@@ -1,2 +1,5 @@
 include blackjack/rules.json
 include blackjack/schema.json
+include blackjack/strategy_files/basic_hard.csv
+include blackjack/strategy_files/basic_soft.csv
+include blackjack/strategy_files/basic_split.csv

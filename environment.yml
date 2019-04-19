@@ -1,8 +1,8 @@
 name: blackjack-dev
 channels:
-- PSLmodels
 - conda-forge
 dependencies:
 - tqdm
 - paramtools
 - pytest
+- pandas
