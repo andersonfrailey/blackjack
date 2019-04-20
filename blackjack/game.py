@@ -305,21 +305,26 @@ class Game:
                 print(f"Dealer Total: {dealer.total}")
             if hand.bust:
                 hand.player.settle_up(hand_data, dealer.total,
-                                      "loss", payout, blackjack_payout)
+                                      "loss", payout, blackjack_payout,
+                                      dealer.blackjack)
             elif dealer.bust:
                 hand.player.settle_up(hand_data, dealer.total,
-                                      "win", payout, blackjack_payout)
+                                      "win", payout, blackjack_payout,
+                                      dealer.blackjack)
             elif hand > dealer:
                 hand.player.settle_up(hand_data, dealer.total,
-                                      "win", payout, blackjack_payout)
+                                      "win", payout, blackjack_payout,
+                                      dealer.blackjack)
             elif hand < dealer:
                 hand.player.settle_up(hand_data, dealer.total,
-                                      "loss", payout, blackjack_payout)
+                                      "loss", payout, blackjack_payout,
+                                      dealer.blackjack)
             else:
                 if self.verbose:
                     print("Push")
                 hand.player.settle_up(hand_data, dealer.total,
-                                      "push", payout, blackjack_payout)
+                                      "push", payout, blackjack_payout,
+                                      dealer.blackjack)
             if self.verbose:
                 print(f"Player Bankroll: {hand.player.bankroll}\n")
 

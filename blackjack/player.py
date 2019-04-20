@@ -64,7 +64,7 @@ class Player:
         return self.insurance_func(player=self, **kwargs)
 
     def settle_up(self, hand_data, dealer_total, result, payout,
-                  blackjack_payout):
+                  blackjack_payout, dealer_blackjack):
         """
         This method logs all of the data for a given hand
         Parameters
@@ -82,6 +82,9 @@ class Player:
             "start_bankroll": self.bankroll + wager,
             "result": result
         }
+        # pay off insurance
+        if hand_data["insurance"] and dealer_blackjack:
+            self.bankroll += wager
         # adjust bankroll according to result
         if result == "win":
             if hand_data["blackjack"]:
