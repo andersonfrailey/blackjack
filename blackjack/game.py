@@ -148,9 +148,6 @@ class Game:
                     elif action == "SPLIT":
                         # only allow split if the card ranks are equal and they
                         # only have two cards
-                        # allowed = (hand.card_one == hand.cards[1] and
-                        #            len(hand.cards) == 2 and
-                        #            hand.player.bankroll >= hand.wager)
                         card_match = hand.card_one == hand.cards[1]
                         starting_hand = len(hand.cards) == 1
                         bankroll = hand.player.bankroll >= hand.wager
@@ -193,16 +190,17 @@ class Game:
                             hand.player.bankroll -= hand.wager
                             # hand.wager *= 2
                             setattr(hand, "wager", hand.wager * 2)
-                        # whether or not the double is allowed, the player will
-                        # add a card
-                        action = "HIT"
-                    if action == "HIT":
+                        # if not allowed to double, just hit
+                        else:
+                            action = "HIT"
+                    if action == "HIT" or action == "DOUBLE":
                         hit_data = {"start_total": hand.total,
                                     "start_count": self.count,
                                     "start_ten_count": self.ten_count,
                                     "start_other_count": self.other_count,
                                     "round_id": self.round_id,
-                                    "hand_id": hand_id}
+                                    "hand_id": hand_id,
+                                    "action": action}
                         card = self.deck.deal()
                         hit_data["card_received_rank"] = card.rank
                         self._count(card)
