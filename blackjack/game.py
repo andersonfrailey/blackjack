@@ -188,7 +188,6 @@ class Game:
                             setattr(hand, "stand", True)
                             # double the player's bet
                             hand.player.bankroll -= hand.wager
-                            # hand.wager *= 2
                             setattr(hand, "wager", hand.wager * 2)
                         # if not allowed to double, just hit
                         else:
