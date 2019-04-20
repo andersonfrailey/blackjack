@@ -78,7 +78,8 @@ class Game:
             min_bet = self.game_params.min_bet
             max_bet = self.game_params.max_bet
             hands.append(Hand(card_one, player=player,
-                              min_bet=min_bet, max_bet=max_bet))
+                              min_bet=min_bet, max_bet=max_bet,
+                              game_params=self.game_params))
         # break out of function if there are no more players with money
         if hands == []:
             return "break"
@@ -111,6 +112,7 @@ class Game:
             print(f"Player Hands:")
             for hand in hands:
                 print(f"{hand.cards[0]}{hand.cards[1]}")
+                print(f"Wager: {hand.wager}")
             if dealer.blackjack:
                 print("Dealer Blackjack")
         # check for dealer blackjack
@@ -132,11 +134,12 @@ class Game:
                 if self.verbose:
                     print(f"{hand.cards[0]}{hand.cards[1]}")
                 while not hand.stand and not hand.bust:
-                    action = hand.player.action(hand, dealer_up,
+                    action = hand.player.action(hand, dealer_up.value,
                                                 start_count=start_count,
                                                 count=self.count,
                                                 ten_count=self.ten_count,
-                                                other_count=self.other_count)
+                                                other_count=self.other_count,
+                                                game_params=self.game_params)
                     if self.verbose:
                         print(f"Player action: {action}")
                     if action == "STAND":
@@ -145,9 +148,10 @@ class Game:
                     elif action == "SPLIT":
                         # only allow split if the card ranks are equal and they
                         # only have two cards
-                        allowed = (hand.card_one == hand.cards[1] and
-                                   len(hand.cards) == 2 and
-                                   hand.player.bankroll >= hand.wager)
+                        card_match = hand.card_one == hand.cards[1]
+                        starting_hand = len(hand.cards) == 1
+                        bankroll = hand.player.bankroll >= hand.wager
+                        allowed = card_match and starting_hand and bankroll
                         if not allowed:
                             action = "HIT"
                         else:
@@ -155,9 +159,15 @@ class Game:
                             hand_one_card = hand.card_one
                             hand_two_card = hand.cards[1]
                             hand_one = Hand(hand_one_card, from_split=True,
-                                            player=hand.player)
+                                            player=hand.player,
+                                            min_bet=min_bet,
+                                            max_bet=max_bet,
+                                            game_params=self.game_params)
                             hand_two = Hand(hand_two_card, from_split=True,
-                                            player=hand.player)
+                                            player=hand.player,
+                                            min_bet=min_bet,
+                                            max_bet=max_bet,
+                                            game_params=self.game_params)
                             # insert the hands in the hands list so they are
                             # iterated over next
                             hands.insert(hands.index(hand) + 1, hand_one)
@@ -178,17 +188,18 @@ class Game:
                             setattr(hand, "stand", True)
                             # double the player's bet
                             hand.player.bankroll -= hand.wager
-                            hand.wager *= 2
-                        # whether or not the double is allowed, the player will
-                        # add a card
-                        action = "HIT"
-                    if action == "HIT":
+                            setattr(hand, "wager", hand.wager * 2)
+                        # if not allowed to double, just hit
+                        else:
+                            action = "HIT"
+                    if action == "HIT" or action == "DOUBLE":
                         hit_data = {"start_total": hand.total,
                                     "start_count": self.count,
                                     "start_ten_count": self.ten_count,
                                     "start_other_count": self.other_count,
                                     "round_id": self.round_id,
-                                    "hand_id": hand_id}
+                                    "hand_id": hand_id,
+                                    "action": action}
                         card = self.deck.deal()
                         hit_data["card_received_rank"] = card.rank
                         self._count(card)
@@ -291,23 +302,28 @@ class Game:
                 print(f"Dealer Total: {dealer.total}")
             if hand.bust:
                 hand.player.settle_up(hand_data, dealer.total,
-                                      "loss", payout, blackjack_payout)
+                                      "loss", payout, blackjack_payout,
+                                      dealer.blackjack)
             elif dealer.bust:
                 hand.player.settle_up(hand_data, dealer.total,
-                                      "win", payout, blackjack_payout)
+                                      "win", payout, blackjack_payout,
+                                      dealer.blackjack)
             elif hand > dealer:
                 hand.player.settle_up(hand_data, dealer.total,
-                                      "win", payout, blackjack_payout)
+                                      "win", payout, blackjack_payout,
+                                      dealer.blackjack)
             elif hand < dealer:
                 hand.player.settle_up(hand_data, dealer.total,
-                                      "loss", payout, blackjack_payout)
+                                      "loss", payout, blackjack_payout,
+                                      dealer.blackjack)
             else:
                 if self.verbose:
                     print("Push")
                 hand.player.settle_up(hand_data, dealer.total,
-                                      "push", payout, blackjack_payout)
+                                      "push", payout, blackjack_payout,
+                                      dealer.blackjack)
             if self.verbose:
-                print(f"Player Bankroll: {hand.player.bankroll}")
+                print(f"Player Bankroll: {hand.player.bankroll}\n")
 
     def _count(self, card):
         """

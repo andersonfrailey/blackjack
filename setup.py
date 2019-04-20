@@ -13,7 +13,7 @@ setuptools.setup(
     long_description=long_description,
     url="https://github.com/andersonfrailey/blackjack",
     packages=["blackjack"],
-    install_requires=["tqdm", "paramtools"],
+    install_requires=["tqdm", "paramtools", "pandas"],
     tests_require=["pytest"],
     classifiers=[
         "Programming Language :: Python :: 3",
