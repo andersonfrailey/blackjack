@@ -1,4 +1,10 @@
 {
+    "schema": {
+        "additional_members": {
+            "section_1": {"type": "str"},
+            "section_2": {"type": "str"}
+        }
+    },
     "soft_stand": {
         "title": "Dealer stands on a soft value",
         "description": "Whether or not the dealer must stand when they reach their stand threshold with a soft hand",

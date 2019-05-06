@@ -4,6 +4,7 @@ Player class as arguments for strategy_func, wager_func, or insurance_func
 """
 
 import os
+import random
 import pandas as pd
 
 
@@ -128,3 +129,10 @@ def accept_insurance(**kwargs):
     Player class.
     """
     return True
+
+
+def random_choice(**kwargs):
+    """
+    Randomly pick a move
+    """
+    return random.choice(["HIT", "STAND"])
