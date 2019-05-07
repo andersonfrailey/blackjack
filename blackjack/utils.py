@@ -14,7 +14,8 @@ def results_pct(data):
     return round(pct_win, 3), round(pct_loss, 3), round(pct_push, 3)
 
 
-def pct_chart(data, result="win", title="Winning Pct", width=500, height=500):
+def result_heatmap(data, result="win", title="Winning Pct",
+                   width=500, height=500):
     """
     Function that takes a player's history data and returns an altair chart
     showing their winning percentage based on their hand totals and the
@@ -75,7 +76,7 @@ def pct_bust(data):
     return round((data["new_total"] > 21).sum() / len(data), 3)
 
 
-def bar_chart(data, name=None, width=100):
+def outcome_bars(data, name=None, width=100):
     """
     Create a bar chart showing the percentage of hands won, lost, and pushed
     """
