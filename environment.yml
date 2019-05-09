@@ -6,3 +6,4 @@ dependencies:
 - paramtools
 - pytest
 - pandas
+- altair
