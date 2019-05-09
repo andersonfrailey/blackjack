@@ -14,7 +14,6 @@ CUR_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
 class GameParams(Parameters):
-    schema = os.path.join(CUR_PATH, "schema.json")
     defaults = os.path.join(CUR_PATH, "rules.json")
     array_first = True
 
@@ -199,7 +198,8 @@ class Game:
                                     "start_other_count": self.other_count,
                                     "round_id": self.round_id,
                                     "hand_id": hand_id,
-                                    "action": action}
+                                    "action": action,
+                                    "soft": int(hand.soft)}
                         card = self.deck.deal()
                         hit_data["card_received_rank"] = card.rank
                         self._count(card)
