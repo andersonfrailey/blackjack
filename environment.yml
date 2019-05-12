@@ -1,4 +1,4 @@
-name: blackjack-dev
+name: py21-dev
 channels:
 - conda-forge
 dependencies:

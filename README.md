@@ -1,16 +1,16 @@
 # Blackjack
 
-`blackjack` is a blackjack simulator. Users can run the simulation using the
+`py21` is a blackjack simulator. Users can run the simulation using the
 default rules or specify their own. Additionally, users can test their own
 playing and betting strategies.
 
 ## Installation
 
-Right now `blackjack` can only be installed from source. Clone or download this
+Right now `py21` can only be installed from source. Clone or download this
 repository, then navigate to the directory you cloned to and run
 `pip install -e .`.
 
-## Using `blackjack`
+## Using `py21`
 
 To run the simulator, the user must initiate one instance of the `Game` class
 and at least one instance of the `Player` class.
@@ -45,7 +45,7 @@ played.
 Running a simulation can be done in a few lines of code:
 
 ```python
-from blackjack import Game, Player
+from py21 import Game, Player
 
 # initiate Player object
 player = Player(100)
@@ -65,7 +65,7 @@ To update a rule in the game, use this dictionary format:
 For example, here is how to change the blackjack payout from 3:2 to 6:5:
 
 ```python
-from blackjack import Game, Player
+from py21 import Game, Player
 
 rules = {"blackjack_payout": 1.2}
 

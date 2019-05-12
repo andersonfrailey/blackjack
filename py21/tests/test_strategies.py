@@ -1,9 +1,9 @@
 """
 Test the various strategies in strategies.py
 """
-from blackjack.strategies import (basic_strategy, hit_to_seventeen,
-                                  minimum_bet, maximum_bet, decline_insurance,
-                                  accept_insurance)
+from py21.strategies import (basic_strategy, hit_to_seventeen,
+                             minimum_bet, maximum_bet, decline_insurance,
+                             accept_insurance)
 
 
 def test_insurance():

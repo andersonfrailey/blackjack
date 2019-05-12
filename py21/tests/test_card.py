@@ -2,7 +2,7 @@
 Test Suite for Card class
 """
 import pytest
-from blackjack import Card
+from py21 import Card
 
 
 def test_card_implementation():
