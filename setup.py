@@ -11,6 +11,7 @@ setuptools.setup(
     author_email="andersonfrailey@gmail.org",
     description="Library for running blackjack simulations",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     url="https://github.com/andersonfrailey/blackjack",
     packages=["py21"],
     install_requires=["tqdm", "paramtools", "pandas"],
