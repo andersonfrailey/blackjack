@@ -6,9 +6,13 @@ playing and betting strategies.
 
 ## Installation
 
-Right now `py21` can only be installed from source. Clone or download this
+Right now `py21` can be installed from source or PyPI.
+
+To download from source, clone or download this
 repository, then navigate to the directory you cloned to and run
 `pip install -e .`.
+
+To download from PyPI, use `pip install py21`
 
 ## Using `py21`
 
@@ -17,13 +21,15 @@ and at least one instance of the `Player` class.
 
 The `Player` class requires one input, `bankroll`, and has three optional inputs:
 `strategy_func`, `wager_func`, and `insurance_func`.
+
 `bankroll` should be an numerical value indicating the bankroll
 the player will be starting with.
 
 `strategy_func` should be a function that will
 return what action the player will take in a given situation. This function
 can take as inputs a number of variables containing information about the game
-such as the player's hand, dealer's up card, and the count.
+such as the player's hand, dealer's up card, and the count. It must return one
+of the following: `HIT`, `STAND`, `SPLIT`, `DOUBLE`.
 
 `wager_func` should be a function that will determine how much the player will
 wager in a hand. Like the function used for `strategy_func` it can take as
@@ -145,3 +151,24 @@ Possible values: True, False
 What share of a player's original bet they must pay to purchase insurance.
 Default value: 0.5
 Possible values: 0-1
+
+#### `insurance_payout`
+
+If the player purchases insurance and the dealer has blackjack, the player will
+receive this decimal percent of their bet back.
+Default value: 1
+Possible values: 0-9e99
+
+#### `surrender_allowed`
+
+Whether or not the player is allowed to surrender a hand.
+Default value: True
+Possible values: True, False
+NOTE: This parameter has not be implemented yet, therefore changing it will have
+      no impact on game play
+
+#### `num_decks`
+
+The number of decks the game will be played with
+Default value: 8
+Possible values: 1-9e99

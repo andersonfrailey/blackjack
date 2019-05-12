@@ -180,7 +180,7 @@
     },
     "insurance_payout": {
         "title": "Payout on insurance",
-        "description": "If the player purchases insurance and the dealer has blackjack, this will be the payout.",
+        "description": "If the player purchases insurance and the dealer has blackjack, the player will receive this decimal percent of their bet back.",
         "notes": "",
         "section_1": "Game",
         "section_2": "Insurance",
