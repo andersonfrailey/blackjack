@@ -5,14 +5,14 @@ with open("README.md", "r") as f:
     long_description = f.read()
 
 setuptools.setup(
-    name="blackjack",
-    version=os.environ.get("VERSION", "0.0.0"),
+    name="py21",
+    version=os.environ.get("VERSION", "1.0.0"),
     author="Anderson Frailey",
     author_email="andersonfrailey@gmail.org",
     description="Library for running blackjack simulations",
     long_description=long_description,
     url="https://github.com/andersonfrailey/blackjack",
-    packages=["blackjack"],
+    packages=["py21"],
     install_requires=["tqdm", "paramtools", "pandas"],
     tests_require=["pytest"],
     classifiers=[
