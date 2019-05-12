@@ -2,7 +2,7 @@
 Test suite for the Hand class
 """
 import pytest
-from blackjack import Card, Hand, Player
+from py21 import Card, Hand, Player
 
 
 def test_hand_implementation():

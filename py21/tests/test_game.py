@@ -2,7 +2,7 @@
 Test suite for the game class
 """
 import pytest
-from blackjack import Game, Player
+from py21 import Game, Player
 
 
 def test_game_implementation():

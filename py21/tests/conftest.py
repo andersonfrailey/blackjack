@@ -1,5 +1,5 @@
 import pytest
-from blackjack import Card, Hand, Player
+from py21 import Card, Hand, Player
 
 
 @pytest.fixture(scope="session")

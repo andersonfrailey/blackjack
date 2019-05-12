@@ -2,7 +2,7 @@
 Test suite for Player class
 """
 import pytest
-from blackjack import Player
+from py21 import Player
 
 
 def test_wager():

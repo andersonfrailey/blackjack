@@ -2,7 +2,7 @@
 Test suite for the deck class
 """
 import pytest
-from blackjack import Card, Deck
+from py21 import Card, Deck
 
 
 def test_deck():
