@@ -36,14 +36,14 @@ class Hand:
 
     def add_card_two(self, card):
         """
-        Add second card to hand
+        Add second card to hand.
         """
         self.add_card(card)
         self._check_blackjack()
 
     def add_card(self, card):
         """
-        Add a new card to the hand. Check the new total and see if busted
+        Add a new card to the hand. Check the new total and see if busted.
         """
         if not isinstance(card, Card):
             raise TypeError("'card' must be a Card object.")

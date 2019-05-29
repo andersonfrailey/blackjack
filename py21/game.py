@@ -3,18 +3,19 @@ The Game class is used to handle all of the logistics of the game including
 dealing the cards, playing the players hands, and playing the dealer
 """
 import copy
-import os
+import difflib
 from .deck import Deck
 from .hand import Hand
 from paramtools.parameters import Parameters
 from tqdm import tqdm
+from pathlib import Path
 
 
-CUR_PATH = os.path.abspath(os.path.dirname(__file__))
+CUR_PATH = Path(__file__).resolve().parent
 
 
 class GameParams(Parameters):
-    defaults = os.path.join(CUR_PATH, "rules.json")
+    defaults = Path(CUR_PATH, "rules.json").open("r").read()
     array_first = True
 
 
@@ -24,9 +25,6 @@ class Game:
         """
         Parameters
         ----------
-        num_decks: number of decks to play with.
-        rules: rules of the game regarding whether a dealer hits on soft 17
-            or not.
         players: list of Python objects that are used to act as players in the
             game.
         rules: dictionary containing any rule updates
@@ -62,7 +60,10 @@ class Game:
 
     def play_round(self):
         """
-        Play a single round of blackjack
+        Play a single round of blackjack. This method will loop through all of
+        the players in self.player_list assigning each a hand (as long as they
+        have enough money left to make the minimum bet) and then playing that
+        hand to completion.
         """
         start_count = self.count
         self.deck.hands_played += 1
@@ -78,6 +79,8 @@ class Game:
             max_bet = self.game_params.max_bet
             hands.append(Hand(card_one, player=player,
                               min_bet=min_bet, max_bet=max_bet,
+                              count=self.count, ten_count=self.ten_count,
+                              other_count=self.other_count,
                               game_params=self.game_params))
         # break out of function if there are no more players with money
         if hands == []:
@@ -98,9 +101,11 @@ class Game:
             if self.game_params.insurance_allowed:
                 for hand in hands:
                     insurance = hand.player.insurance(
+                        start_count=start_count,
                         count=self.count,
                         ten_count=self.ten_count,
-                        other_count=self.other_count
+                        other_count=self.other_count,
+                        game_params=self.game_params
                     )
                     setattr(hand, "insurance", insurance)
                     if insurance:
@@ -161,11 +166,19 @@ class Game:
                                             player=hand.player,
                                             min_bet=min_bet,
                                             max_bet=max_bet,
+                                            start_count=start_count,
+                                            count=self.count,
+                                            ten_count=self.ten_count,
+                                            other_count=self.other_count,
                                             game_params=self.game_params)
                             hand_two = Hand(hand_two_card, from_split=True,
                                             player=hand.player,
                                             min_bet=min_bet,
                                             max_bet=max_bet,
+                                            start_count=start_count,
+                                            count=self.count,
+                                            ten_count=self.ten_count,
+                                            other_count=self.other_count,
                                             game_params=self.game_params)
                             # insert the hands in the hands list so they are
                             # iterated over next
@@ -262,7 +275,12 @@ class Game:
 
     def simulate(self, rounds):
         """
-        Simulate a given number of hands of blackjack
+        Simulate a given number of hands of blackjack. This method calls the
+        play_round method for the number of rounds specified.
+
+        Parameters
+        ----------
+        rounds: number of rounds to be played
         """
         for i in tqdm(range(rounds)):
             # break out of loop if all players run out of money
@@ -275,9 +293,18 @@ class Game:
 
     def _update_params(self, rules):
         """
-        Update the game parameters based on user input
+        Update the game parameters based on user input.
         """
+        allowed_params = self.game_params.specification().keys()
         for param in rules.keys():
+            # ensure parameter is allowed
+            if param not in allowed_params:
+                similar = difflib.get_close_matches(param, allowed_params)
+                msg = (
+                    f"Unexpected parameter name {param}. Similar parameter(s) "
+                    f"are {similar}"
+                )
+                raise ValueError(msg)
             val = rules[param]
             rules[param] = [{"value": val}]
         self.game_params.adjust(rules)
