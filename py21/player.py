@@ -12,8 +12,10 @@ class Player:
         Parameters
         ----------
         bankroll: starting bankroll for a player
-        strategy: CSV file containing a player's strategy
-        wager: function to determine how much the player will be wagering
+        strategy_func: function to determine which action the player will take
+            under a given situation.
+        wager_func: function to determine how much the player will be wagering.
+        insurance_func: function to determine when the player takes insurance.
         """
         self.bankroll = bankroll
         # self.strategy = strategy
@@ -33,7 +35,7 @@ class Player:
 
     def wager(self, min_bet, max_bet, **kwargs):
         """
-        This function is essentially a wrapper for the wager function passed in
+        This method is a wrapper for the wager function passed in
         by the user when initializing the Player object.
         """
         wager = self.wager_func(player=self, min_bet=min_bet, max_bet=max_bet,
@@ -50,8 +52,8 @@ class Player:
 
     def action(self, hand, dealer_up, **kwargs):
         """
-        This method returns a player action based on the dealer's up card and
-        the hand total.
+        This method is a wrapper for the strategy function passed in by the
+        user when initializing the Player object.
         """
         if hand.blackjack:
             return "STAND"
@@ -61,16 +63,28 @@ class Player:
         return action
 
     def insurance(self, **kwargs):
-        return self.insurance_func(player=self, **kwargs)
+        """
+        This method is a wrapper for the insurance function passed in by the
+        user when initializing the Player object.
+        """
+        action = self.insurance_func(player=self, **kwargs)
+        assert isinstance(action, bool), (
+            "Insurance action must be True or False"
+        )
+        return action
 
     def settle_up(self, hand_data, dealer_total, result, payout,
                   blackjack_payout, dealer_blackjack):
         """
-        This method logs all of the data for a given hand
+        This method logs all of the data for a given hand.
         Parameters
         ----------
         hand_data: dictionary containing information on the hand
         dealer_total: final total for the dealer
+        payout: payout for winning a hand
+        blackjack_payout: payout for winning a hand with blackjack
+        dealer_blackjack: boolean indicating whether or not the dealer had
+            blackjack
         Returns
         -------
         None
@@ -88,10 +102,10 @@ class Player:
         # adjust bankroll according to result
         if result == "win":
             if hand_data["blackjack"]:
-                payout = wager + (wager * blackjack_payout)
+                _payout = wager + (wager * blackjack_payout)
             else:
-                payout = wager + (wager * payout)
-            self.bankroll += payout
+                _payout = wager + (wager * payout)
+            self.bankroll += _payout
         elif result == "push":
             # add back wager if they push
             self.bankroll += wager

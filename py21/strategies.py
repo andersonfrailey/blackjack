@@ -3,22 +3,25 @@ This file contains a number of built in strategies that can be passed to the
 Player class as arguments for strategy_func, wager_func, or insurance_func
 """
 
-import os
 import random
 import pandas as pd
+from pathlib import Path
 
 
-CUR_PATH = os.path.abspath(os.path.dirname(__file__))
+CUR_PATH = Path(__file__).resolve().parent
 # read in strategy files
-BASIC_HARD = pd.read_csv(os.path.join(CUR_PATH, "strategy_files",
-                                      "basic_hard.csv"),
-                         index_col=0).to_dict()
-BASIC_SOFT = pd.read_csv(os.path.join(CUR_PATH, "strategy_files",
-                                      "basic_soft.csv"),
-                         index_col=0).to_dict()
-BASIC_SPLIT = pd.read_csv(os.path.join(CUR_PATH, "strategy_files",
-                                       "basic_split.csv"),
-                          index_col=0).to_dict()
+BASIC_HARD = pd.read_csv(
+    Path(CUR_PATH, "strategy_files", "basic_hard.csv"),
+    index_col=0
+).to_dict()
+BASIC_SOFT = pd.read_csv(
+    Path(CUR_PATH, "strategy_files", "basic_soft.csv"),
+    index_col=0
+).to_dict()
+BASIC_SPLIT = pd.read_csv(
+    Path(CUR_PATH, "strategy_files", "basic_split.csv"),
+    index_col=0
+).to_dict()
 
 
 def basic_strategy(player, hand, dealer_up, game_params, **kwargs):
