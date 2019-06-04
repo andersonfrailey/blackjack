@@ -138,3 +138,32 @@ def outcome_bars(data, name=None, width=100):
         ]
     )
     return chart
+
+
+def house_edge(data, game_params):
+    """
+    Function for calculating house edge.
+    Parameters
+    ----------
+    data: data from your simulations
+    game_params: parameters from the game you simulated
+    """
+    if isinstance(data, list):
+        data = pd.DataFrame(data)
+    # find probability of each event
+    _, loss_prob, push_prob = results_pct(data)
+    # separate winning events into blackjack and non-blackjack wins
+    num_hands = len(data)
+    blackjack_prob = len(data[data["blackjack"] == 1]) / num_hands
+    win_prob = (len(data[(data["blackjack"] == 0) &
+                         (data["result"] == "win")]) /
+                num_hands)
+    # calculate expected payout
+    expected_value = (
+        (game_params.payout * win_prob) +
+        (game_params.blackjack_payout * blackjack_prob) +
+        (-1 * loss_prob) +
+        (0 * push_prob)
+    )
+
+    return expected_value * -1
