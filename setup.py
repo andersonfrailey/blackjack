@@ -6,7 +6,7 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="py21",
-    version=os.environ.get("VERSION", "1.0.0"),
+    version=os.environ.get("VERSION", "1.1.0"),
     author="Anderson Frailey",
     author_email="andersonfrailey@gmail.org",
     description="Library for running blackjack simulations",
