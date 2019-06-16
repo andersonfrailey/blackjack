@@ -1,7 +1,7 @@
 """
 Definition of the player class
 """
-from .strategies import hit_to_seventeen, minimum_bet, decline_insurance
+from .strategies import basic_strategy, minimum_bet, decline_insurance
 
 
 class Player:
@@ -25,7 +25,7 @@ class Player:
         else:
             self.wager_func = wager_func
         if not strategy_func:
-            self.strategy_func = hit_to_seventeen
+            self.strategy_func = basic_strategy
         else:
             self.strategy_func = strategy_func
         if not insurance_func:
