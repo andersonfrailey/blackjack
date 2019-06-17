@@ -302,11 +302,9 @@ class Game:
                 similar = difflib.get_close_matches(param, allowed_params)
                 msg = (
                     f"Unexpected parameter name {param}. Similar parameter(s) "
-                    f"are {similar}"
+                    f"are: {similar}"
                 )
                 raise ValueError(msg)
-            val = rules[param]
-            rules[param] = [{"value": val}]
         self.game_params.adjust(rules)
 
     def _compare(self, hands, dealer, payout, blackjack_payout):
