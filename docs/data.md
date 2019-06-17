@@ -25,6 +25,7 @@ take a hit.
 * `soft`: boolean indicator for whether or not the player's total is soft
 * `start_bankroll`: the player's bankroll at the start of the round
 * `start_total`: the player's total from their first two cards
+* `surrender`: boolean indicator for whether or not the hand was surrendered
 * `total`: the player's final total
 * `wager`: amount the player wagered on the hand
 
