@@ -14,7 +14,7 @@ def results_pct(data):
     return round(pct_win, 3), round(pct_loss, 3), round(pct_push, 3)
 
 
-def result_heatmap(data, result="win", title="Winning Pct",
+def result_heatmap(data, result="win", title=None,
                    width=500, height=500):
     """
     Function that takes a player's history data and returns an altair chart
@@ -24,6 +24,8 @@ def result_heatmap(data, result="win", title="Winning Pct",
     assert result in ["win", "loss", "push"], (
         "'result' must be 'win', 'loss', or 'push'"
     )
+    if not title:
+        title = f"{result.title()} Percentage"
     # convert data to a DataFrame if it's just a player's history list
     if isinstance(data, list):
         data = pd.DataFrame(data)
@@ -38,6 +40,14 @@ def result_heatmap(data, result="win", title="Winning Pct",
     grouped_pct.columns = ["win", "loss", "push"]
     # reset index and sort for plotting
     pct_data = grouped_pct.reset_index().sort_values("total", ascending=False)
+    # dynamically determine how the legend should be labeled
+    min_val = round(min(pct_data[["win", "loss", "push"]].min()), 1)
+    max_val = round(max(pct_data[["win", "loss", "push"]].max()), 1)
+    min_int = int(min_val * 10)
+    max_int = int(max_val * 10)
+    values = [
+        round(x * 0.1, 1) for x in range(min_int, max_int + 1)
+    ]
     # create altair heatmap
     chart = alt.Chart(
         pct_data, title=title, width=width, height=height
@@ -56,7 +66,7 @@ def result_heatmap(data, result="win", title="Winning Pct",
             f"{result}:Q",
             legend=alt.Legend(
                 title=f"{result.title()} Probability",
-                values=[0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+                values=values
             )
         ),
         tooltip=[
