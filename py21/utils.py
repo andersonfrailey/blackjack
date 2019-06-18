@@ -120,7 +120,7 @@ def outcome_bars(data, name=None, width=100):
             {"game": _name, "result": "Loss", "pct": loss, "order": 2}
         )
         plot_data_list.append(
-         {"game": _name, "result": "Push", "pct": push, "order": 3}   
+         {"game": _name, "result": "Push", "pct": push, "order": 3} 
         )
     plot_data = pd.DataFrame(plot_data_list)
 
