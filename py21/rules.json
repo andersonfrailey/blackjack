@@ -8,12 +8,10 @@
     "soft_stand": {
         "title": "Dealer stands on a soft value",
         "description": "Whether or not the dealer must stand when they reach their stand threshold with a soft hand",
-        "notes": "",
         "section_1": "Game",
         "section_2": "Dealer",
         "type": "bool",
-        "number_dims": 0,
-        "value": [{"value": true}],
+        "value": true,
         "validators": {
             "choice": {
                 "choices": [true, false]
@@ -23,12 +21,10 @@
     "stand_total": {
         "title": "Dealer Stands on",
         "description": "The dealer must stand when their hand reaches this total or higher",
-        "notes": "",
         "section_1": "Game",
         "section_2": "Dealer",
         "type": "int",
-        "number_dims": 0,
-        "value": [{"value": 17}],
+        "value": 17,
         "validators": {
             "range": {
                 "min": 4,
@@ -39,12 +35,10 @@
     "double_after_split": {
         "title": "Player can double down after spliting a pair",
         "description": "Whether or not a player can double down after they split a pair",
-        "notes": "",
         "section_1": "Game",
         "section_2": "Player",
         "type": "bool",
-        "number_dims": 0,
-        "value": [{"value": true}],
+        "value": true,
         "validators": {
             "choice": {
                 "choices": [true, false]
@@ -54,12 +48,10 @@
     "payout": {
         "title": "Payout for a winning hand",
         "description": "Multiplicative payout for winning a hand",
-        "notes": "",
         "section_1": "Game",
         "section_2": "Payout",
         "type": "float",
-        "number_dims": 0,
-        "value": [{"value": 1}],
+        "value": 1,
         "validators": {
             "range": {
                 "min": 0,
@@ -70,12 +62,10 @@
     "blackjack_payout": {
         "title": "Payout for a blackjack",
         "description": "Multiplicative payout for a blackjack",
-        "notes": "",
         "section_1": "Game",
         "section_2": "Payout",
         "type": "float",
-        "number_dims": 0,
-        "value": [{"value": 1.5}],
+        "value": 1.5,
         "validators": {
             "range": {
                 "min": 0,
@@ -90,8 +80,7 @@
         "section_1": "Game",
         "section_2": "Deck",
         "type": "float",
-        "number_dims": 0,
-        "value": [{"value": 0.25}],
+        "value": 0.25,
         "validators": {
             "range": {
                 "min": 0,
@@ -102,12 +91,10 @@
     "min_bet": {
         "title": "Minimum Bet",
         "description": "Minimum bet required",
-        "notes": "",
         "section_1": "Game",
         "section_2": "Betting",
         "type": "int",
-        "number_dims": 0,
-        "value": [{"value": 5}],
+        "value": 5,
         "validators": {
             "range": {
                 "min": 0,
@@ -118,12 +105,10 @@
     "max_bet": {
         "title": "Maximum bet",
         "description": "Maximum bet allowed",
-        "notes": "",
         "section_1": "Game",
         "section_2": "Betting",
         "type": "int",
-        "number_dims": 0,
-        "value": [{"value": 500}],
+        "value": 500,
         "validators": {
             "range": {
                 "min": "min_bet",
@@ -134,12 +119,10 @@
     "max_players": {
         "title": "Maximum number of players",
         "description": "Maximum number of players allowed in a game",
-        "notes": "",
         "section_1": "Game",
         "section_2": "Misc",
         "type": "int",
-        "number_dims": 0,
-        "value": [{"value": 10}],
+        "value": 10,
         "validators": {
             "range": {
                 "min": 1,
@@ -150,12 +133,10 @@
     "insurance_allowed": {
         "title": "Player is allowed to take insurance",
         "description": "Boolean indicator for whether a player is allowed to buy insurance when the dealer shows an ace.",
-        "notes": "",
         "section_1": "Game",
         "section_2": "Insurance",
         "type": "bool",
-        "number_dims": 0,
-        "value": [{"value": true}],
+        "value": true,
         "validators": {
             "choice": {
                 "choices": [true, false]
@@ -165,12 +146,10 @@
     "insurance_pct": {
         "title": "Percentage of original wager needed for insurance",
         "description": "If a player chooses to take insurance, the wager is for this portion of their original bet.",
-        "notes": "",
         "section_1": "Game",
         "section_2": "Insurance",
         "type": "float",
-        "number_dims": 0,
-        "value": [{"value": 0.5}],
+        "value": 0.5,
         "validators": {
             "range": {
                 "min": 0,
@@ -181,12 +160,10 @@
     "insurance_payout": {
         "title": "Payout on insurance",
         "description": "If the player purchases insurance and the dealer has blackjack, the player will receive this decimal percent of their bet back.",
-        "notes": "",
         "section_1": "Game",
         "section_2": "Insurance",
         "type": "float",
-        "number_dims": 0,
-        "value": [{"value": 1}],
+        "value": 1,
         "validators": {
             "range": {
                 "min": 0,
@@ -201,8 +178,7 @@
         "section_1": "Game",
         "section_2": "Surrender",
         "type": "bool",
-        "number_dims": 0,
-        "value": [{"value": true}],
+        "value": true,
         "validators": {
             "choice": {
                 "choices": [true, false]
@@ -212,12 +188,10 @@
     "num_decks": {
         "title": "Number of decks the game will be played with",
         "description": "Number of decks used in the game.",
-        "notes": "",
         "section_1": "Game",
         "section_2": "Deck",
         "type": "int",
-        "number_dims": 0,
-        "value": [{"value": 8}],
+        "value": 8,
         "validators": {
             "range": {
                 "min": 1,
