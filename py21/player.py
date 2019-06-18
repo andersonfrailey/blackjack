@@ -59,7 +59,7 @@ class Player:
             return "STAND"
         action = self.strategy_func(player=self, hand=hand,
                                     dealer_up=dealer_up, **kwargs).upper()
-        assert action in ["STAND", "SPLIT", "HIT", "DOUBLE"]
+        assert action in ["STAND", "SPLIT", "HIT", "DOUBLE", "SURRENDER"]
         return action
 
     def insurance(self, **kwargs):

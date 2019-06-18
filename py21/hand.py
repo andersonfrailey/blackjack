@@ -33,6 +33,7 @@ class Hand:
         self.from_split = from_split
         self.insurance = False
         self.total = card_one.value
+        self.surender = False
 
     def add_card_two(self, card):
         """
@@ -79,7 +80,8 @@ class Hand:
             "num_cards": len(self.cards),
             "start_total": self.cards[0] + self.cards[1],
             "wager": int(self.wager),
-            "insurance": int(self.insurance)
+            "insurance": int(self.insurance),
+            "surrender": int(self.surender)
         }
         return data
 

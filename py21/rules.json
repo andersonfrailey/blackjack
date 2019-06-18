@@ -174,7 +174,6 @@
     "surrender_allowed": {
         "title": "Player is allowed to surrender their hand",
         "description": "Boolean indicator for whether or not a player is allowed to surrender after receiving their hand.",
-        "notes": "Surrender has not yet been implemented in the game play so updating this rule will have no effect.",
         "section_1": "Game",
         "section_2": "Surrender",
         "type": "bool",
@@ -196,6 +195,19 @@
             "range": {
                 "min": 1,
                 "max": 9e+99
+            }
+        }
+    },
+    "surrender_after_split": {
+        "title": "Player is allowed to surrender their hand after splitting it",
+        "description": "Boolean indicator for whether a player is allowed to buy insurance when the dealer shows an ace.",
+        "section_1": "Game",
+        "section_2": "Surrender",
+        "type": "bool",
+        "value": false,
+        "validators": {
+            "choice": {
+                "choices": [true, false]
             }
         }
     }

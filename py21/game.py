@@ -137,7 +137,7 @@ class Game:
                     num_busts_splits_blackjacks += 1
                 if self.verbose:
                     print(f"{hand.cards[0]}{hand.cards[1]}")
-                while not hand.stand and not hand.bust:
+                while not hand.stand and not hand.bust and not hand.surender:
                     action = hand.player.action(hand, dealer_up.value,
                                                 start_count=start_count,
                                                 count=self.count,
@@ -204,6 +204,22 @@ class Game:
                         # if not allowed to double, just hit
                         else:
                             action = "HIT"
+                    elif action == "SURRENDER":
+                        # only allow surender if they player hasn't taken a
+                        # card yet and if the game rules allow
+                        allowed = (
+                            self.game_params.surrender_allowed &
+                            len(hand.cards) == 2
+                        )
+                        if hand.from_split and allowed:
+                            allowed = self.game_params.surrender_after_split
+                        if allowed:
+                            setattr(hand, "surrender", True)
+                        else:
+                            raise ValueError(
+                                "Surrender is not allowed either because"
+                            )
+                        continue
                     if action == "HIT" or action == "DOUBLE":
                         hit_data = {"start_total": hand.total,
                                     "start_count": self.count,
