@@ -7,6 +7,11 @@ def results_pct(data):
     Return the percentage of hands won, lost, and pushed
     in a given dataset
     """
+    if not isinstance(data, list):
+        print("nope")
+    if isinstance(data, list):
+        print("yep")
+        data = pd.DataFrame(data)
     num_hands = len(data)
     pct_loss = len(data[data["result"] == "loss"]) / num_hands
     pct_win = len(data[data["result"] == "win"]) / num_hands
@@ -120,7 +125,7 @@ def outcome_bars(data, name=None, width=100):
             {"game": _name, "result": "Loss", "pct": loss, "order": 2}
         )
         plot_data_list.append(
-         {"game": _name, "result": "Push", "pct": push, "order": 3} 
+         {"game": _name, "result": "Push", "pct": push, "order": 3}
         )
     plot_data = pd.DataFrame(plot_data_list)
 

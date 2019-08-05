@@ -116,7 +116,7 @@ class Game:
             print(f"Player Hands:")
             for hand in hands:
                 print(f"{hand.cards[0]}{hand.cards[1]}")
-                print(f"Wager: {hand.wager}")
+                print(f"Wager: {hand.wager}\n")
             if dealer.blackjack:
                 print("Dealer Blackjack")
         # check for dealer blackjack
@@ -136,7 +136,7 @@ class Game:
                 if hand.blackjack:
                     num_busts_splits_blackjacks += 1
                 if self.verbose:
-                    print(f"{hand.cards[0]}{hand.cards[1]}")
+                    print(f"Current Hand: {hand.cards[0]}{hand.cards[1]}")
                 while not hand.stand and not hand.bust and not hand.surender:
                     action = hand.player.action(hand, dealer_up.value,
                                                 start_count=start_count,
@@ -144,8 +144,6 @@ class Game:
                                                 ten_count=self.ten_count,
                                                 other_count=self.other_count,
                                                 game_params=self.game_params)
-                    if self.verbose:
-                        print(f"Player action: {action}")
                     if action == "STAND":
                         setattr(hand, "stand", True)
                         continue
