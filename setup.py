@@ -22,5 +22,10 @@ setuptools.setup(
         "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: MIT License"
     ],
-    include_package_data=True
+    include_package_data=True,
+    entry_points={
+        "console_scripts": [
+            "blackjack = py21.cli:main"
+        ]
+    }
 )
