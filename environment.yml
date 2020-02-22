@@ -6,4 +6,4 @@ dependencies:
 - paramtools
 - pytest
 - pandas
-- altair
+- altair==3.2.0

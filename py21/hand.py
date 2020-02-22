@@ -33,7 +33,7 @@ class Hand:
         self.from_split = from_split
         self.insurance = False
         self.total = card_one.value
-        self.surender = False
+        self.surrender = False
 
     def add_card_two(self, card):
         """
@@ -82,7 +82,7 @@ class Hand:
                 "start_total": self.cards[0] + self.cards[1],
                 "wager": int(self.wager),
                 "insurance": int(self.insurance),
-                "surrender": int(self.surender)
+                "surrender": int(self.surrender)
             }
             return data
         except IndexError:
