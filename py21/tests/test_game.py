@@ -25,13 +25,13 @@ def test_game_implementation():
     with pytest.raises(AssertionError):
         Game([])
 
-    # ensure surender throws and error if not allowed
+    # ensure surrender throws and error if not allowed
     rules = {"surrender_allowed": False}
 
-    def surender(**kwargs):
+    def surrender(**kwargs):
         return "SURRENDER"
 
-    player = Player(100, strategy_func=surender)
+    player = Player(100, strategy_func=surrender)
     game = Game([player], rules=rules)
     with pytest.raises(ValueError):
         game.play_round()

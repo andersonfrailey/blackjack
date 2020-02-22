@@ -243,7 +243,7 @@ class Game:
         """
         Function that contains all of the logic for playing a hand
         """
-        while not hand.stand and not hand.bust and not hand.surender:
+        while not hand.stand and not hand.bust and not hand.surrender:
             action = hand.player.action(hand, dealer_up,
                                         start_count=start_count,
                                         count=self.count,
@@ -352,7 +352,7 @@ class Game:
                 else:
                     action = "HIT"
             elif action == "SURRENDER":
-                # only allow surender if they player hasn't taken a
+                # only allow surrender if they player hasn't taken a
                 # card yet and if the game rules allow
                 allowed = (
                     self.game_params.surrender_allowed &
