@@ -191,13 +191,26 @@ Default value: True
 
 Possible values: True, False
 
-NOTE: This parameter has not be implemented yet, therefore changing it will have
-      no impact on game play
+#### `surrender_after_split`
+
+Whether or not a player is allowed to surrender their hand after splitting it.
+
+Default value: True
+
+Possible values: True, False
 
 #### `num_decks`
 
-The number of decks the game will be played with
+The number of decks the game will be played with.
 
 Default value: 8
+
+Possible values: 1-9e99
+
+#### `max_split_hands`
+
+The maximum number of times a player is allowed to split their hand during a round.
+
+Default value: 3
 
 Possible values: 1-9e99
