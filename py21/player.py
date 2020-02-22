@@ -33,13 +33,17 @@ class Player:
         else:
             self.insurance_func = insurance_func
 
-    def wager(self, min_bet, max_bet, **kwargs):
+    def wager(self, min_bet, max_bet, split_wager=None, **kwargs):
         """
         This method is a wrapper for the wager function passed in
         by the user when initializing the Player object.
         """
-        wager = self.wager_func(player=self, min_bet=min_bet, max_bet=max_bet,
-                                **kwargs)
+        if split_wager:
+            wager = split_wager
+        else:
+            wager = self.wager_func(
+                player=self, min_bet=min_bet, max_bet=max_bet, **kwargs
+            )
         # assert that the bet is within table stakes and player can afford it
         assert min_bet <= wager <= max_bet, (
             f"{wager} not between min. bet {min_bet} and max bet {max_bet}"

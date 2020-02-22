@@ -2,6 +2,9 @@
 The Game class is used to handle all of the logistics of the game including
 dealing the cards, playing the players hands, and playing the dealer
 """
+# ignore no-member in pylist because it's raised for the game parameters
+# because pylint doesn't know about paramtools
+# pylint: disable=no-member
 import copy
 import difflib
 from .deck import Deck
@@ -21,7 +24,7 @@ class GameParams(Parameters):
 
 class Game:
 
-    def __init__(self, players, rules=None, verbose=False):
+    def __init__(self, players, rules=None, verbose=False, test=False):
         """
         Parameters
         ----------
@@ -30,6 +33,8 @@ class Game:
         rules: dictionary containing any rule updates
         verbose: boolean indicator for whether or not output should be printed
             as the game progresses
+        test: boolean value for whether or not this is a test run. This should
+            only be used during unit tests
         """
         # game parameters
         # make a copy of rules to avoid modifying the original dictionary
@@ -41,12 +46,11 @@ class Game:
                 raise TypeError("'rules' must be a dictionary.")
             self._update_params(self.rules)
         self.num_decks = self.game_params.num_decks
-        self.deck = Deck(self.num_decks)
+        self.deck = Deck(self.num_decks, test=test)
         self.count = 0
         self.ten_count = 16 * self.num_decks  # count of tens seen
         self.other_count = 36 * self.num_decks  # count of non-tens seens
         self.player_list = players
-        self.count = 0
         self.num_players = len(players)
         assert 1 <= self.num_players <= self.game_params.max_players
         self.verbose = verbose
@@ -58,6 +62,12 @@ class Game:
         # burn first card
         self.deck.deal()
 
+        # list to hold completed hands. Will be cleared after each round
+        self._completed_hands = []
+        # counter for the number of times a hand is split. Used to enforce max
+        # number of times a hand can be split
+        self._num_splits = 0
+
     def play_round(self):
         """
         Play a single round of blackjack. This method will loop through all of
@@ -65,9 +75,14 @@ class Game:
         have enough money left to make the minimum bet) and then playing that
         hand to completion.
         """
+        # set all counts at the time players would be betting
         start_count = self.count
+        start_ten_count = self.ten_count
+        start_other_count = self.other_count
         self.deck.hands_played += 1
         hands = []  # holds all of the hands the players will play
+        min_bet = self.game_params.min_bet
+        max_bet = self.game_params.max_bet
         # deal first card to all players
         for player in self.player_list:
             # skip any players without a high enough bankroll
@@ -75,12 +90,10 @@ class Game:
                 continue
             card_one = self.deck.deal()
             self._count(card_one)
-            min_bet = self.game_params.min_bet
-            max_bet = self.game_params.max_bet
             hands.append(Hand(card_one, player=player,
                               min_bet=min_bet, max_bet=max_bet,
-                              count=self.count, ten_count=self.ten_count,
-                              other_count=self.other_count,
+                              count=start_count, ten_count=start_ten_count,
+                              other_count=start_other_count,
                               game_params=self.game_params))
         # break out of function if there are no more players with money
         if hands == []:
@@ -122,134 +135,34 @@ class Game:
         # check for dealer blackjack
         # play only if the dealer doesn't have blackjack
         if not dealer.blackjack:
-            hand_id = 0
             # play each hand
             num_busts_splits_blackjacks = 0
-            for hand in hands:
-                hand_id += 1
-                # if the new hand is from a split, add a second card before
-                # playing
-                if hand.from_split:
-                    card = self.deck.deal()
-                    self._count(card)
-                    hand.add_card_two(card)
-                if hand.blackjack:
-                    num_busts_splits_blackjacks += 1
+            for _hand_id, hand in enumerate(hands):
+                hand_id = _hand_id + 1
                 if self.verbose:
                     print(f"{hand.cards[0]}{hand.cards[1]}")
-                while not hand.stand and not hand.bust and not hand.surender:
-                    action = hand.player.action(hand, dealer_up.value,
-                                                start_count=start_count,
-                                                count=self.count,
-                                                ten_count=self.ten_count,
-                                                other_count=self.other_count,
-                                                game_params=self.game_params)
-                    if self.verbose:
-                        print(f"Player action: {action}")
-                    if action == "STAND":
-                        setattr(hand, "stand", True)
-                        continue
-                    elif action == "SPLIT":
-                        # only allow split if the card ranks are equal and they
-                        # only have two cards
-                        card_match = hand.card_one == hand.cards[1]
-                        starting_hand = len(hand.cards) == 1
-                        bankroll = hand.player.bankroll >= hand.wager
-                        allowed = card_match and starting_hand and bankroll
-                        if not allowed:
-                            action = "HIT"
-                        else:
-                            # create two new hands using original two cards
-                            hand_one_card = hand.card_one
-                            hand_two_card = hand.cards[1]
-                            hand_one = Hand(hand_one_card, from_split=True,
-                                            player=hand.player,
-                                            min_bet=min_bet,
-                                            max_bet=max_bet,
-                                            start_count=start_count,
-                                            count=self.count,
-                                            ten_count=self.ten_count,
-                                            other_count=self.other_count,
-                                            game_params=self.game_params)
-                            hand_two = Hand(hand_two_card, from_split=True,
-                                            player=hand.player,
-                                            min_bet=min_bet,
-                                            max_bet=max_bet,
-                                            start_count=start_count,
-                                            count=self.count,
-                                            ten_count=self.ten_count,
-                                            other_count=self.other_count,
-                                            game_params=self.game_params)
-                            # insert the hands in the hands list so they are
-                            # iterated over next
-                            hands.insert(hands.index(hand) + 1, hand_one)
-                            hands.insert(hands.index(hand) + 2, hand_two)
-                            # flag the hand as split and skip other play logic
-                            setattr(hand, "split", True)
-                            num_busts_splits_blackjacks += 1
-                            continue
-                    elif action == "DOUBLE":
-                        # can only double in your first move
-                        allowed = (len(hand.cards) == 2 and
-                                   hand.player.bankroll >= hand.wager)
-                        # not all games allow you to double split hands
-                        if hand.from_split:
-                            allowed = self.game_params.double_after_split
-                        # if allowed, you must stand after doubling down
-                        if allowed:
-                            setattr(hand, "stand", True)
-                            # double the player's bet
-                            hand.player.bankroll -= hand.wager
-                            setattr(hand, "wager", hand.wager * 2)
-                        # if not allowed to double, just hit
-                        else:
-                            action = "HIT"
-                    elif action == "SURRENDER":
-                        # only allow surender if they player hasn't taken a
-                        # card yet and if the game rules allow
-                        allowed = (
-                            self.game_params.surrender_allowed &
-                            len(hand.cards) == 2
-                        )
-                        if hand.from_split and allowed:
-                            allowed = self.game_params.surrender_after_split
-                        if allowed:
-                            setattr(hand, "surrender", True)
-                        else:
-                            raise ValueError(
-                                "Surrender is not allowed either because"
-                            )
-                        continue
-                    if action == "HIT" or action == "DOUBLE":
-                        hit_data = {"start_total": hand.total,
-                                    "start_count": self.count,
-                                    "start_ten_count": self.ten_count,
-                                    "start_other_count": self.other_count,
-                                    "round_id": self.round_id,
-                                    "hand_id": hand_id,
-                                    "action": action,
-                                    "soft": int(hand.soft)}
-                        card = self.deck.deal()
-                        hit_data["card_received_rank"] = card.rank
-                        self._count(card)
-                        hand.add_card(card)
-                        hit_data["new_total"] = hand.total
-                        card_received_value = (hit_data["new_total"] -
-                                               hit_data["start_total"])
-                        hit_data["card_received_value"] = card_received_value
-                        self.hit_results.append(hit_data)
-                        if self.verbose:
-                            print(f"Card Received: {card}")
-                            print(f"New Total: {hand.total}")
-                    if hand.bust:
-                        num_busts_splits_blackjacks += 1
-
+                # if they have blackjack, skip to the next hand
+                if hand.blackjack:
+                    num_busts_splits_blackjacks += 1
+                    continue
+                self._play_hand(
+                    hand, dealer_up.value, min_bet, max_bet, hand_id,
+                    start_count, start_ten_count, start_other_count
+                )
+                # reset number of splt hands
+                setattr(self, "_num_splits", 0)
             # count dealer's second card
             self._count(dealer.cards[1])
             if self.verbose:
                 print(f"Dealer Hand: {dealer.cards[0]} {dealer.cards[1]}")
             # if needed, play the dealer
-            dealer_play = num_busts_splits_blackjacks != len(hands)
+            dealer_play = False
+            # we only need the dealer to play their hand if there's someone
+            # who hasn't busted or gotten blackjack
+            for hand in self._completed_hands:
+                if not hand.bust and not hand.blackjack:
+                    dealer_play = True
+                    break
             if dealer_play:
                 stand_total = self.game_params.stand_total
                 soft_stand = self.game_params.soft_stand
@@ -274,8 +187,10 @@ class Game:
                         else:
                             dealer_stand = True
 
-        self._compare(hands, dealer, self.game_params.payout,
+        self._compare(dealer, self.game_params.payout,
                       self.game_params.blackjack_payout)
+        # clear completed hands list
+        del self._completed_hands[:]
         # check if the deck should be shuffled
         new_deck = self.deck.check_status(self.game_params.shuffle_freq)
         # burn first card
@@ -323,7 +238,161 @@ class Game:
                 raise ValueError(msg)
         self.game_params.adjust(rules)
 
-    def _compare(self, hands, dealer, payout, blackjack_payout):
+    def _play_hand(self, hand, dealer_up, min_bet, max_bet, hand_id,
+                   start_count, start_ten_count, start_other_count):
+        """
+        Function that contains all of the logic for playing a hand
+        """
+        while not hand.stand and not hand.bust and not hand.surender:
+            action = hand.player.action(hand, dealer_up,
+                                        start_count=start_count,
+                                        count=self.count,
+                                        ten_count=self.ten_count,
+                                        other_count=self.other_count,
+                                        game_params=self.game_params)
+            if self.verbose:
+                print(f"Player action: {action}")
+            if action == "STAND":
+                setattr(hand, "stand", True)
+                break
+            elif action == "SPLIT":
+                # only allow split if the card ranks are equal and they
+                # only have two cards
+                card_match = hand.card_one == hand.cards[1]
+                starting_hand = len(hand.cards) == 2
+                bankroll = hand.player.bankroll >= hand.wager
+                n_splits = self._num_splits < self.game_params.max_split_hands
+                allowed = (
+                    card_match and starting_hand and bankroll and n_splits
+                )
+                if not allowed:
+                    if self.verbose:
+                        print(
+                            "Split not allowed. Hitting instead. "
+                            "See listed flags for explanation\n"
+                            f"card match: {card_match}\n"
+                            f"start of hand: {starting_hand}\n"
+                            f"large enough bankroll: {bankroll}\n"
+                            f"fewer than 3 splits: {n_splits}"
+                        )
+                    action = "HIT"
+                else:
+                    self._num_splits += 1
+                    hand.split = True
+                    # We need to "return" the original wager the
+                    # player made because each subsequent hand will
+                    # subtract an equal wager from the bankroll.
+                    # this keeps us from double chargind for the first
+                    # split hand
+                    hand.player.bankroll += hand.wager
+                    # create two new hands using original two cards
+                    hand_one_card = hand.card_one
+                    hand_two_card = hand.cards[1]
+                    hand_one = Hand(hand_one_card, from_split=True,
+                                    player=hand.player,
+                                    min_bet=min_bet,
+                                    max_bet=max_bet,
+                                    start_count=start_count,
+                                    count=start_count,
+                                    ten_count=start_ten_count,
+                                    other_count=start_other_count,
+                                    game_params=self.game_params,
+                                    split_wager=hand.wager)
+                    hand_two = Hand(hand_two_card, from_split=True,
+                                    player=hand.player,
+                                    min_bet=min_bet,
+                                    max_bet=max_bet,
+                                    start_count=start_count,
+                                    count=start_count,
+                                    ten_count=start_ten_count,
+                                    other_count=start_other_count,
+                                    game_params=self.game_params,
+                                    split_wager=hand.wager)
+                    # play both hands
+                    if self.verbose:
+                        print("Playing Split Hands")
+                        print("First Split Hand")
+                    card_two = self.deck.deal()
+                    self._count(card_two)
+                    hand_one.add_card_two(card_two)
+                    if self.verbose:
+                        print(f"New Hand: {hand_one.cards[0]}{card_two}")
+                    self._play_hand(
+                        hand_one, dealer_up, min_bet, max_bet, hand_id,
+                        start_count, start_ten_count, start_other_count
+                    )
+                    if self.verbose:
+                        print("Second Split Hand")
+                    # play second hand from split
+                    card_two = self.deck.deal()
+                    self._count(card_two)
+                    hand_two.add_card_two(card_two)
+                    if self.verbose:
+                        print(f"New Hand: {hand_two.cards[0]}{card_two}")
+                    self._play_hand(
+                        hand_two, dealer_up, min_bet, max_bet, hand_id,
+                        start_count, start_ten_count, start_other_count
+                    )
+                    # exit loop
+                    break
+            elif action == "DOUBLE":
+                # can only double in your first move
+                allowed = (len(hand.cards) == 2 and
+                            hand.player.bankroll >= hand.wager)
+                # not all games allow you to double split hands
+                if hand.from_split:
+                    allowed = self.game_params.double_after_split
+                # if allowed, you must stand after doubling down
+                if allowed:
+                    setattr(hand, "stand", True)
+                    # double the player's bet
+                    hand.player.bankroll -= hand.wager
+                    setattr(hand, "wager", hand.wager * 2)
+                # if not allowed to double, just hit
+                else:
+                    action = "HIT"
+            elif action == "SURRENDER":
+                # only allow surender if they player hasn't taken a
+                # card yet and if the game rules allow
+                allowed = (
+                    self.game_params.surrender_allowed &
+                    len(hand.cards) == 2
+                )
+                if hand.from_split and allowed:
+                    allowed = self.game_params.surrender_after_split
+                if allowed:
+                    setattr(hand, "surrender", True)
+                else:
+                    raise ValueError(
+                        "Surrender is not allowed"
+                    )
+                continue
+            if action == "HIT" or action == "DOUBLE":
+                hit_data = {"start_total": hand.total,
+                            "start_count": self.count,
+                            "start_ten_count": self.ten_count,
+                            "start_other_count": self.other_count,
+                            "round_id": self.round_id,
+                            "hand_id": hand_id,
+                            "action": action,
+                            "soft": int(hand.soft)}
+                card = self.deck.deal()
+                hit_data["card_received_rank"] = card.rank
+                self._count(card)
+                hand.add_card(card)
+                hit_data["new_total"] = hand.total
+                card_received_value = (hit_data["new_total"] -
+                                       hit_data["start_total"])
+                hit_data["card_received_value"] = card_received_value
+                self.hit_results.append(hit_data)
+                if self.verbose:
+                    print(f"Card Received: {card}")
+                    print(f"New Total: {hand.total}")
+        # only append non-split hands
+        if not hand.split:
+            self._completed_hands.append(hand)
+
+    def _compare(self, dealer, payout, blackjack_payout):
         """
         Function to compare the dealer to each hand in hands and settle up
         """
@@ -332,9 +401,9 @@ class Game:
             "dealer_blackjack": int(dealer.blackjack),
             "dealer_up": dealer.card_one.value
         }
-        for hand in hands:
+        for hand in self._completed_hands:
             hand_data = {**hand.summary_data(), **additional_data}
-            hand_data["hand_id"] = hands.index(hand) + 1
+            hand_data["hand_id"] = self._completed_hands.index(hand) + 1
             # skip split hands
             if hand.split:
                 continue
@@ -370,9 +439,9 @@ class Game:
         """
         Count cards as they're delt
         """
-        if 2 <= card.rank <= 6:
+        if 2 <= card.value <= 6:
             self.count += 1
-        elif card.rank >= 10:
+        elif card.value >= 10:
             self.count -= 1
             self.ten_count -= 1
         if card.value < 10:

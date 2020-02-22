@@ -6,14 +6,17 @@ from .card import Card
 
 class Deck:
 
-    def __init__(self, decks):
+    def __init__(self, decks, test=False):
         """
         Initialize Deck class and create the first deck
         """
         self.deck = []
         self.decks = decks
         self.num_creates = 0
-        self.create_deck()
+        if test:
+            self._create_test_deck()
+        else:
+            self.create_deck()
         self.num_pop = 0
         self.hands_played = 0
 
@@ -74,6 +77,16 @@ class Deck:
         if _shuffle:
             self.create_deck()
         return _shuffle
+
+    def _create_test_deck(self):
+        """
+        Create a deck used for testing
+        """
+        # this deck is created to ensure that the player will need to split
+        # their hand
+        test_ranks = [2, 6, 4, 6, 9, 8, 2, 12, 3, 13, 5, 4, 10, 11]
+        for rank in test_ranks:
+            self.deck.append(Card(rank, "C"))
 
     def __len__(self):
         return len(self.deck)

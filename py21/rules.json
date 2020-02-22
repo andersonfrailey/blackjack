@@ -160,6 +160,7 @@
     "insurance_payout": {
         "title": "Payout on insurance",
         "description": "If the player purchases insurance and the dealer has blackjack, the player will receive this decimal percent of their bet back.",
+        "notes": "Be warned that if you set this too high, there is the possibility that you go on a streak of split hands and run out of cards in the deck",
         "section_1": "Game",
         "section_2": "Insurance",
         "type": "float",
@@ -208,6 +209,20 @@
         "validators": {
             "choice": {
                 "choices": [true, false]
+            }
+        }
+    },
+    "max_split_hands": {
+        "title": "This is the maxmium number of hands a player can split",
+        "description": "This is the number of times a player many only split their hand in a single round of play",
+        "section_1": "Game",
+        "section_2":"Player",
+        "type": "int",
+        "value": 3,
+        "validators": {
+            "range": {
+                "min": 1,
+                "max": 9e+99
             }
         }
     }

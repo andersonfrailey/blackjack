@@ -1,6 +1,9 @@
 """
 Test suite for the game class
 """
+# ignore no-member in pylist because it's raised for the game parameters
+# because pylint doesn't know about paramtools
+# pylint: disable=no-member
 import pytest
 from py21 import Game, Player
 
@@ -32,6 +35,13 @@ def test_game_implementation():
     game = Game([player], rules=rules)
     with pytest.raises(ValueError):
         game.play_round()
+
+    # test split and count implementations
+    rules = {"shuffle_freq": 0}
+    t_game = Game([Player(100)], rules=rules, test=True)
+    t_game.play_round()
+    assert t_game.player_list[0].bankroll == 110.0
+    assert t_game.count == 3
 
 
 def test_simulation():

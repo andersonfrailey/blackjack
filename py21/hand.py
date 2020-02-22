@@ -67,23 +67,26 @@ class Hand:
         """
         This method returns a dictionary with data on the hand.
         """
-        data = {
-            "total": self.total,
-            "card_one_value": self.cards[0].value,
-            "card_two_value": self.cards[1].value,
-            "card_one_rank": self.cards[0].rank,
-            "card_two_rank": self.cards[1].rank,
-            "cards": [card.rank for card in self.cards],
-            "soft": int(self.soft),
-            "from_split": int(self.from_split),
-            "blackjack": int(self.blackjack),
-            "num_cards": len(self.cards),
-            "start_total": self.cards[0] + self.cards[1],
-            "wager": int(self.wager),
-            "insurance": int(self.insurance),
-            "surrender": int(self.surender)
-        }
-        return data
+        try:
+            data = {
+                "total": self.total,
+                "card_one_value": self.cards[0].value,
+                "card_two_value": self.cards[1].value,
+                "card_one_rank": self.cards[0].rank,
+                "card_two_rank": self.cards[1].rank,
+                "cards": [card.rank for card in self.cards],
+                "soft": int(self.soft),
+                "from_split": int(self.from_split),
+                "blackjack": int(self.blackjack),
+                "num_cards": len(self.cards),
+                "start_total": self.cards[0] + self.cards[1],
+                "wager": int(self.wager),
+                "insurance": int(self.insurance),
+                "surrender": int(self.surender)
+            }
+            return data
+        except IndexError:
+            import pdb; pdb.set_trace()
 
     # Private methods of Card class
 
