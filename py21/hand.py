@@ -26,7 +26,7 @@ class Hand:
             self.wager = self.player.wager(**kwargs)
         self.cards = [card_one]
         self.split = False
-        self.soft = False
+        self.soft = card_one.rank == 14
         self.stand = False
         self.bust = False
         self.blackjack = False
@@ -58,8 +58,9 @@ class Hand:
         if self.soft:
             if self.total > 21:
                 self.total -= 10
-                if card.rank != 14 or not start_soft:
-                    self.soft = False
+                self.soft = False
+                if card.rank == 14:
+                    self.soft = True
         if self.total > 21:
             self.bust = True
 

@@ -16,6 +16,15 @@ def test_hand_implementation():
     with pytest.raises(TypeError):
         Hand(card_one, card_two, dict)
 
+    hand = Hand(Card(12, "H"))
+    hand.add_card_two(Card(5, "S"))
+    assert hand.total == 15
+    assert not hand.soft
+    hand.add_card(Card(4, "D"))
+    assert hand.total == 19
+    hand.add_card(Card(10, "S"))
+    assert hand.bust
+
 
 def test_add_card_two():
     card = Card(3, "C")
@@ -49,18 +58,28 @@ def test_blackjack():
 def test_soft():
     hand = Hand(Card(14, "C"))
     hand.add_card_two(Card(14, "D"))
+    assert hand.soft
+    assert hand.total == 12
+    hand.add_card(Card(14, "D"))
+    assert hand.soft
+    assert hand.total == 13
+    hand.add_card(Card(10, "H"))
     assert not hand.soft
+    assert hand.total == 13
 
     hand = Hand(Card(5, "D"))
     hand.add_card_two(Card(14, "S"))
     assert hand.soft
+    assert hand.total == 16
 
     hand = Hand(Card(6, "H"))
     hand.add_card_two(Card(3, "H"))
     hand.add_card(Card(14, "H"))
     assert hand.soft
+    assert hand.total == 20
 
     hand = Hand(Card(14, "D"))
     hand.add_card_two(Card(3, "H"))
     hand.add_card(Card(10, "C"))
     assert not hand.soft
+    assert hand.total == 14
