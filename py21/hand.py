@@ -34,6 +34,8 @@ class Hand:
         self.insurance = False
         self.total = card_one.value
         self.surrender = False
+        # this is used to determine whether to add 11 or 1 when delt an ace
+        self.non_ace_total = 0
 
     def add_card_two(self, card):
         """
@@ -48,18 +50,26 @@ class Hand:
         """
         if not isinstance(card, Card):
             raise TypeError("'card' must be a Card object.")
+        # we're just not going to let people hit once they've reached 21
+        if self.total == 21 or self.bust:
+            msg = (
+                f"Hand total is {self.total}. You can't hit more once you've"
+                " reached 21 or busted.")
+            raise ValueError(msg)
         # append the new card to the list of cards in the hand
         self.cards.append(card)
         self.total = card + self.total
         start_soft = self.soft
         if card.rank == 14:
             setattr(self, "soft", True)
+        else:
+            self.non_ace_total += card.value
         # account for soft hands
         if self.soft:
             if self.total > 21:
                 self.total -= 10
                 self.soft = False
-                if card.rank == 14:
+                if card.rank == 14 and self.non_ace_total < 11:
                     self.soft = True
         if self.total > 21:
             self.bust = True

@@ -83,3 +83,15 @@ def test_soft():
     hand.add_card(Card(10, "C"))
     assert not hand.soft
     assert hand.total == 14
+    hand.add_card(Card(14, "S"))
+    assert hand.total == 15
+    assert not hand.soft
+
+    # edge case. you're delt a bunch of aces
+    hand = Hand(Card(14, "S"))
+    hand.add_card_two(Card(14, "D"))
+    for _ in range(9):
+        hand.add_card(Card(14, "S"))
+    assert hand.total == 21
+    with pytest.raises(ValueError):
+        hand.add_card(Card(14, "S"))
