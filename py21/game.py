@@ -451,4 +451,4 @@ class Game:
         if card.value < 10:
             self.other_count -= 1
         # update true count
-        self.true_count = self.count / self.deck / 52
+        self.true_count = self.count / len(self.deck) / 52
