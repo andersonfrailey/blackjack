@@ -49,3 +49,12 @@ def test_game_implementation():
 def test_simulation():
     game = Game([Player(100)])
     game.simulate(10)
+
+
+def test_true_count():
+    rules = {"num_decks": 1}
+    game = Game([Player(100)], rules)
+    game.play_round()
+    remaining_decks = len(game.deck) / 52
+    true_count = game.count / remaining_decks
+    assert game.true_count == true_count
