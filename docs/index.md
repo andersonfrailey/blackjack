@@ -63,6 +63,7 @@ following arguments:
 * `count`: the current count.
 * `ten_count`: number of cards with a value of ten left in the deck.
 * `other_count`: number of cards with a value other than ten left in the deck.
+* `true_count`: the count at the start of the hand, divided by the number of decks remaining.
 * `game_params`: the current rules of the game.
 
 You can use all of these arguments to determine when a player hits, stands,
