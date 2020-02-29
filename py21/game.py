@@ -50,6 +50,7 @@ class Game:
         self.count = 0
         self.ten_count = 16 * self.num_decks  # count of tens seen
         self.other_count = 36 * self.num_decks  # count of non-tens seens
+        self.true_count = 0
         self.player_list = players
         self.num_players = len(players)
         assert 1 <= self.num_players <= self.game_params.max_players
@@ -94,6 +95,7 @@ class Game:
                               min_bet=min_bet, max_bet=max_bet,
                               count=start_count, ten_count=start_ten_count,
                               other_count=start_other_count,
+                              true_count=self.true_count,
                               game_params=self.game_params))
         # break out of function if there are no more players with money
         if hands == []:
@@ -296,6 +298,7 @@ class Game:
                                     count=start_count,
                                     ten_count=start_ten_count,
                                     other_count=start_other_count,
+                                    true_count=self.true_count,
                                     game_params=self.game_params,
                                     split_wager=hand.wager)
                     hand_two = Hand(hand_two_card, from_split=True,
@@ -306,6 +309,7 @@ class Game:
                                     count=start_count,
                                     ten_count=start_ten_count,
                                     other_count=start_other_count,
+                                    true_count=self.true_count,
                                     game_params=self.game_params,
                                     split_wager=hand.wager)
                     # play both hands
@@ -446,3 +450,6 @@ class Game:
             self.ten_count -= 1
         if card.value < 10:
             self.other_count -= 1
+        # update true count
+        remaining_decks = len(self.deck) / 52
+        self.true_count = self.count / remaining_decks
