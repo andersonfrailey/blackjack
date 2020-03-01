@@ -251,6 +251,7 @@ class Game:
                                         count=self.count,
                                         ten_count=self.ten_count,
                                         other_count=self.other_count,
+                                        true_count=self.true_count,
                                         game_params=self.game_params)
             if self.verbose:
                 print(f"Player action: {action}")
@@ -379,7 +380,8 @@ class Game:
                             "round_id": self.round_id,
                             "hand_id": hand_id,
                             "action": action,
-                            "soft": int(hand.soft)}
+                            "soft": int(hand.soft),
+                            "start_true_count": self.true_count}
                 card = self.deck.deal()
                 hit_data["card_received_rank"] = card.rank
                 self._count(card)

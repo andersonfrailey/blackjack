@@ -1,120 +1,162 @@
 # Default Game Parameters
 
+
 ## `soft_stand`
 
-Whether or not the dealer must stand on a soft total.
+Whether or not the dealer must stand when they reach their stand threshold with a soft hand.
 
-Default value: True
+Default Values: True
 
-Possible values: True, False
+Possible Values: True, False
+
+Notes: N/A
 
 ## `stand_total`
 
-Hand value the dealer must reach before they can stand.
+The dealer must stand when their hand reaches this total or higher.
 
-Default value: 17
+Default Values: 17
 
-Possible values: 4-21
+Possible Values: 4-21
+
+Notes: N/A
 
 ## `double_after_split`
 
-Whether or not a player can double down after splitting a pair.
+Whether or not a player can double down after they split a pair.
 
-Default value: True
+Default Values: True
 
-Possible values: True, False
+Possible Values: True, False
+
+Notes: N/A
 
 ## `payout`
 
-Payout for a winning hand.
+Multiplicative payout for winning a hand.
 
-Default value: 1 (1:1)
+Default Values: 1
 
-Possible values: 0-9e99
+Possible Values: 0-9e+99
+
+Notes: N/A
 
 ## `blackjack_payout`
 
-Total payout if the player has blackjack.
+Multiplicative payout for a blackjack.
 
-Default value: 1.5 (3/2)
+Default Values: 1.5
 
-Possible values: 0-9e99 (infinity)
+Possible Values: 0-9e+99
+
+Notes: N/A
 
 ## `shuffle_freq`
 
-How often the deck is shuffled. If this value is greater than one, the deck
-will be shuffled after that many hands are played. If it is less than one, the
-deck will be shuffled when that percentage of the deck is left.
+How often the deck is shuffled
 
-Default value: 4
+Default Values: 0.25
 
-Possible values: 0-9e99 (note: if the shuffle frequency is too low, an
-error will be raised when the deck runs out of cards)
+Possible Values: 0-9e+99
+
+Notes: If this value is less than one, the deck will be shuffled when less than that percent of the deck remains.
 
 ## `min_bet`
 
 Minimum bet required.
 
-Default value: 5
+Default Values: 5
 
-Possible Values: 0-`max_bet
+Possible Values: 0-max_bet
+
+Notes: N/A
 
 ## `max_bet`
 
 Maximum bet allowed.
 
-Default value: 500
+Default Values: 500
 
-Possible values: `min_bet`-9e99
+Possible Values: min_bet-9e+99
+
+Notes: N/A
 
 ## `max_players`
 
 Maximum number of players allowed in a game.
 
-Default value: 10
+Default Values: 10
 
-Possible values: 1-9e99
+Possible Values: 1-9e+99
+
+Notes: N/A
 
 ## `insurance_allowed`
 
-Whether or not a player is allowed to take insurance when the dealer shoes an ace.
+Boolean indicator for whether a player is allowed to buy insurance when the dealer shows an ace.
 
-Default value: True
+Default Values: True
 
-Possible values: True, False
+Possible Values: True, False
+
+Notes: N/A
 
 ## `insurance_pct`
 
-What share of a player's original bet they must pay to purchase insurance.
+If a player chooses to take insurance, the wager is for this portion of their original bet.
 
-Default value: 0.5
+Default Values: 0.5
 
-Possible values: 0-1
+Possible Values: 0-1
+
+Notes: N/A
 
 ## `insurance_payout`
 
-If the player purchases insurance and the dealer has blackjack, the player will
-receive this decimal percent of their bet back.
+If the player purchases insurance and the dealer has blackjack, the player will receive this decimal percent of their bet back.
 
-Default value: 1
+Default Values: 1
 
-Possible values: 0-9e99
+Possible Values: 0-9e+99
+
+Notes: N/A
 
 ## `surrender_allowed`
 
-Whether or not the player is allowed to surrender a hand.
+Boolean indicator for whether or not a player is allowed to surrender after receiving their hand.
 
-Default value: True
+Default Values: True
 
-Possible values: True, False
+Possible Values: True, False
 
-NOTE: This parameter has not be implemented yet, therefore changing it will have
-      no impact on game play
+Notes: N/A
 
 ## `num_decks`
 
-The number of decks the game will be played with
+Number of decks used in the game.
 
-Default value: 8
+Default Values: 8
 
-Possible values: 1-9e99
+Possible Values: 1-9e+99
+
+Notes: N/A
+
+## `surrender_after_split`
+
+Boolean indicator for whether a player is allowed to buy insurance when the dealer shows an ace.
+
+Default Values: False
+
+Possible Values: True, False
+
+Notes: N/A
+
+## `max_split_hands`
+
+This is the number of times a player many only split their hand in a single round of play.
+
+Default Values: 3
+
+Possible Values: 1-9e+99
+
+Notes: Be warned that if you set this too high, there is the possibility that you go on a streak of split hands and run out of cards in the deck.

@@ -7,7 +7,7 @@
     },
     "soft_stand": {
         "title": "Dealer stands on a soft value",
-        "description": "Whether or not the dealer must stand when they reach their stand threshold with a soft hand",
+        "description": "Whether or not the dealer must stand when they reach their stand threshold with a soft hand.",
         "section_1": "Game",
         "section_2": "Dealer",
         "type": "bool",
@@ -20,7 +20,7 @@
     },
     "stand_total": {
         "title": "Dealer Stands on",
-        "description": "The dealer must stand when their hand reaches this total or higher",
+        "description": "The dealer must stand when their hand reaches this total or higher.",
         "section_1": "Game",
         "section_2": "Dealer",
         "type": "int",
@@ -34,7 +34,7 @@
     },
     "double_after_split": {
         "title": "Player can double down after spliting a pair",
-        "description": "Whether or not a player can double down after they split a pair",
+        "description": "Whether or not a player can double down after they split a pair.",
         "section_1": "Game",
         "section_2": "Player",
         "type": "bool",
@@ -47,7 +47,7 @@
     },
     "payout": {
         "title": "Payout for a winning hand",
-        "description": "Multiplicative payout for winning a hand",
+        "description": "Multiplicative payout for winning a hand.",
         "section_1": "Game",
         "section_2": "Payout",
         "type": "float",
@@ -61,7 +61,7 @@
     },
     "blackjack_payout": {
         "title": "Payout for a blackjack",
-        "description": "Multiplicative payout for a blackjack",
+        "description": "Multiplicative payout for a blackjack.",
         "section_1": "Game",
         "section_2": "Payout",
         "type": "float",
@@ -75,8 +75,8 @@
     },
     "shuffle_freq": {
         "title": "Shuffle frequency",
-        "description": "The deck is shuffled every _ hands",
-        "notes": "If this value is less than one, the deck will be shuffled when less than that percent of the deck remains",
+        "description": "How often the deck is shuffled",
+        "notes": "If this value is less than one, the deck will be shuffled when less than that percent of the deck remains.",
         "section_1": "Game",
         "section_2": "Deck",
         "type": "float",
@@ -90,7 +90,7 @@
     },
     "min_bet": {
         "title": "Minimum Bet",
-        "description": "Minimum bet required",
+        "description": "Minimum bet required.",
         "section_1": "Game",
         "section_2": "Betting",
         "type": "int",
@@ -104,7 +104,7 @@
     },
     "max_bet": {
         "title": "Maximum bet",
-        "description": "Maximum bet allowed",
+        "description": "Maximum bet allowed.",
         "section_1": "Game",
         "section_2": "Betting",
         "type": "int",
@@ -118,7 +118,7 @@
     },
     "max_players": {
         "title": "Maximum number of players",
-        "description": "Maximum number of players allowed in a game",
+        "description": "Maximum number of players allowed in a game.",
         "section_1": "Game",
         "section_2": "Misc",
         "type": "int",
@@ -213,8 +213,8 @@
     },
     "max_split_hands": {
         "title": "This is the maxmium number of hands a player can split",
-        "description": "This is the number of times a player many only split their hand in a single round of play",
-        "notes": "Be warned that if you set this too high, there is the possibility that you go on a streak of split hands and run out of cards in the deck",
+        "description": "This is the number of times a player many only split their hand in a single round of play.",
+        "notes": "Be warned that if you set this too high, there is the possibility that you go on a streak of split hands and run out of cards in the deck.",
         "section_1": "Game",
         "section_2":"Player",
         "type": "int",

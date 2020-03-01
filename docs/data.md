@@ -41,4 +41,5 @@ take a hit.
 * `start_count`: count of the deck before the player took the new card
 * `start_other_count`: number of cards with a value not ten in the deck before the hit
 * `start_ten_count`: number of cards with a value of ten in the deck before the hit
+* `start_true_count`: true count before the player took the new card
 * `start_total`: hand total before the hit
