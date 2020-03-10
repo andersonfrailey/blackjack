@@ -17,6 +17,7 @@ take a hit.
 * `end_bankroll`: the player's bankroll at the end of the round
 * `from_split`: boolean indicator for whether or not the hand comes after the player
   split their starting hand
+* `double_down`: boolean indicator for whether or not the player doubled down on the hand
 * `hand_id`: unique ID for the hand
 * `insurance`: boolean indicator for whether or not the player took insurance
 * `num_cards`: total number of cards in a player's hand at the end of the round
@@ -28,6 +29,8 @@ take a hit.
 * `surrender`: boolean indicator for whether or not the hand was surrendered
 * `total`: the player's final total
 * `wager`: amount the player wagered on the hand
+* `total_wagered`: total amount the player has wagered
+* `roi`: percent return the player has received, evaluated at the end of the hand
 
 ## Hit Data
 

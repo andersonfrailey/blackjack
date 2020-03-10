@@ -53,6 +53,9 @@ def test_blackjack():
     hand = Hand(Card(14, "C"))
     hand.add_card_two(Card(10, "D"))
     assert hand.blackjack
+    hand = Hand(Card(12, "C"))
+    hand.add_card_two(Card(14, "S"))
+    assert hand.blackjack
 
 
 def test_soft():

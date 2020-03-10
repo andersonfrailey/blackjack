@@ -225,5 +225,32 @@
                 "max": 9e+99
             }
         }
+    },
+    "split_blackjack_payout": {
+        "title": "Payout for a blackjack after you've split your hand",
+        "description": "Multiplicative payout for a blackjack after splitting your hand.",
+        "section_1": "Game",
+        "section_2": "Payout",
+        "type": "float",
+        "value": 1,
+        "validators": {
+            "range": {
+                "min": 0,
+                "max": 9e+99
+            }
+        }
+    },
+    "hit_split_aces": {
+        "title": "Hit Split Aces",
+        "description": "boolean indicator for whether a player is allowed to take additional cards after splitting aces.",
+        "section_1": "Game",
+        "section_2": "Player",
+        "type": "bool",
+        "value": false,
+        "validators": {
+            "choice": {
+                "choices": [true, false]
+            }
+        }
     }
 }

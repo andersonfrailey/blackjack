@@ -18,6 +18,10 @@ class Player:
         insurance_func: function to determine when the player takes insurance.
         """
         self.bankroll = bankroll
+        self.start_bankroll = self.bankroll
+        # keep a rolling tally of the amount wagered
+        self.total_wagered = 0
+        self.roi = 0
         # self.strategy = strategy
         self.history = []  # holds hand history
         if not wager_func:
@@ -52,6 +56,7 @@ class Player:
             f"{wager} greater than bankroll {self.bankroll}"
         }
         self.bankroll -= wager
+        self.total_wagered += wager
         return wager
 
     def action(self, hand, dealer_up, **kwargs):
@@ -78,7 +83,7 @@ class Player:
         return action
 
     def settle_up(self, hand_data, dealer_total, result, payout,
-                  blackjack_payout, dealer_blackjack):
+                  blackjack_payout, dealer_blackjack, split_bj_payout):
         """
         This method logs all of the data for a given hand.
         Parameters
@@ -106,7 +111,10 @@ class Player:
         # adjust bankroll according to result
         if result == "win":
             if hand_data["blackjack"]:
-                _payout = wager + (wager * blackjack_payout)
+                if hand_data["from_split"]:
+                    _payout = wager + (wager * split_bj_payout)
+                else:
+                    _payout = wager + (wager * blackjack_payout)
             else:
                 _payout = wager + (wager * payout)
             self.bankroll += _payout
@@ -114,4 +122,7 @@ class Player:
             # add back wager if they push
             self.bankroll += wager
         additonal_data["end_bankroll"] = self.bankroll
+        # return from betting the player has gotten
+        self.roi = (self.bankroll - self.start_bankroll) / self.total_wagered
+        additonal_data["roi"] = self.roi
         self.history.append({**hand_data, **additonal_data})
