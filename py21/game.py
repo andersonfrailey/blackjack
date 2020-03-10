@@ -110,6 +110,9 @@ class Game:
             card_two = self.deck.deal()
             self._count(card_two)
             hand.add_card_two(card_two)
+            if hand.blackjack:
+                if self.verbose:
+                    print("Blackjack!")
         # deal second card to dealer, but don't count until later
         dealer.add_card_two(self.deck.deal())
         if dealer.card_one.rank == 14:
@@ -134,6 +137,8 @@ class Game:
                 print(f"Wager: {hand.wager}")
             if dealer.blackjack:
                 print("Dealer Blackjack")
+                for hand in hands:
+                    self._completed_hands.append(hand)
         # check for dealer blackjack
         # play only if the dealer doesn't have blackjack
         if not dealer.blackjack:
@@ -146,7 +151,7 @@ class Game:
                 # if they have blackjack, skip to the next hand
                 if hand.blackjack:
                     num_busts_splits_blackjacks += 1
-                    continue
+                    # continue
                 self._play_hand(
                     hand, dealer_up.value, min_bet, max_bet, hand_id,
                     start_count, start_ten_count, start_other_count
@@ -190,7 +195,8 @@ class Game:
                             dealer_stand = True
 
         self._compare(dealer, self.game_params.payout,
-                      self.game_params.blackjack_payout)
+                      self.game_params.blackjack_payout,
+                      self.game_params.split_blackjack_payout)
         # clear completed hands list
         del self._completed_hands[:]
         # check if the deck should be shuffled
@@ -282,12 +288,14 @@ class Game:
                 else:
                     self._num_splits += 1
                     hand.split = True
+                    from_aces = hand.card_one.rank == 14
                     # We need to "return" the original wager the
                     # player made because each subsequent hand will
                     # subtract an equal wager from the bankroll.
-                    # this keeps us from double chargind for the first
+                    # this keeps us from double charging for the first
                     # split hand
                     hand.player.bankroll += hand.wager
+                    hand.player.total_wagered -= hand.wager
                     # create two new hands using original two cards
                     hand_one_card = hand.card_one
                     hand_two_card = hand.cards[1]
@@ -322,6 +330,8 @@ class Game:
                     hand_one.add_card_two(card_two)
                     if self.verbose:
                         print(f"New Hand: {hand_one.cards[0]}{card_two}")
+                    if from_aces and not self.game_params.hit_split_aces:
+                        setattr(hand_one, "stand", True)
                     self._play_hand(
                         hand_one, dealer_up, min_bet, max_bet, hand_id,
                         start_count, start_ten_count, start_other_count
@@ -334,6 +344,8 @@ class Game:
                     hand_two.add_card_two(card_two)
                     if self.verbose:
                         print(f"New Hand: {hand_two.cards[0]}{card_two}")
+                    if from_aces and not self.game_params.hit_split_aces:
+                        setattr(hand_two, "stand", True)
                     self._play_hand(
                         hand_two, dealer_up, min_bet, max_bet, hand_id,
                         start_count, start_ten_count, start_other_count
@@ -349,9 +361,12 @@ class Game:
                     allowed = self.game_params.double_after_split
                 # if allowed, you must stand after doubling down
                 if allowed:
+                    # flag hand as a double down
+                    setattr(hand, "double_down", True)
                     setattr(hand, "stand", True)
                     # double the player's bet
                     hand.player.bankroll -= hand.wager
+                    hand.player.total_wagered += hand.wager
                     setattr(hand, "wager", hand.wager * 2)
                 # if not allowed to double, just hit
                 else:
@@ -398,7 +413,7 @@ class Game:
         if not hand.split:
             self._completed_hands.append(hand)
 
-    def _compare(self, dealer, payout, blackjack_payout):
+    def _compare(self, dealer, payout, blackjack_payout, split_bj_payout):
         """
         Function to compare the dealer to each hand in hands and settle up
         """
@@ -419,25 +434,25 @@ class Game:
             if hand.bust:
                 hand.player.settle_up(hand_data, dealer.total,
                                       "loss", payout, blackjack_payout,
-                                      dealer.blackjack)
+                                      dealer.blackjack, split_bj_payout)
             elif dealer.bust:
                 hand.player.settle_up(hand_data, dealer.total,
                                       "win", payout, blackjack_payout,
-                                      dealer.blackjack)
+                                      dealer.blackjack, split_bj_payout)
             elif hand > dealer:
                 hand.player.settle_up(hand_data, dealer.total,
                                       "win", payout, blackjack_payout,
-                                      dealer.blackjack)
+                                      dealer.blackjack, split_bj_payout)
             elif hand < dealer:
                 hand.player.settle_up(hand_data, dealer.total,
                                       "loss", payout, blackjack_payout,
-                                      dealer.blackjack)
+                                      dealer.blackjack, split_bj_payout)
             else:
                 if self.verbose:
                     print("Push")
                 hand.player.settle_up(hand_data, dealer.total,
                                       "push", payout, blackjack_payout,
-                                      dealer.blackjack)
+                                      dealer.blackjack, split_bj_payout)
             if self.verbose:
                 print(f"Player Bankroll: {hand.player.bankroll}\n")
 

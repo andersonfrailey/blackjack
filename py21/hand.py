@@ -34,6 +34,7 @@ class Hand:
         self.insurance = False
         self.total = card_one.value
         self.surrender = False
+        self.double_down = False
         # this is used to determine whether to add 11 or 1 when delt an ace
         self.non_ace_total = 0
 
@@ -93,7 +94,8 @@ class Hand:
                 "start_total": self.cards[0] + self.cards[1],
                 "wager": int(self.wager),
                 "insurance": int(self.insurance),
-                "surrender": int(self.surrender)
+                "surrender": int(self.surrender),
+                "double_down": int(self.double_down)
             }
             return data
         except IndexError:

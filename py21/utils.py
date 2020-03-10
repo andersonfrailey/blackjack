@@ -1,17 +1,77 @@
 import altair as alt
 import pandas as pd
+import numpy as np
+import copy
 
 
-def results_pct(data):
+def results_pct(data, as_series=True):
     """
     Return the percentage of hands won, lost, and pushed
     in a given dataset
+    Parameters
+    ----------
+    data: DataFrame containing the player hand history
+    as_series: Boolean indicating whether the results should be returned as a
+        series
+    Returns
+    -------
+    Pandas series with the percentages of hands won, lost, and pushed,
+    or a tuple containing the same information if `as_series` is false
     """
-    num_hands = len(data)
-    pct_loss = len(data[data["result"] == "loss"]) / num_hands
-    pct_win = len(data[data["result"] == "win"]) / num_hands
-    pct_push = len(data[data["result"] == "push"]) / num_hands
-    return round(pct_win, 3), round(pct_loss, 3), round(pct_push, 3)
+    results = data["result"].value_counts(normalize=True)
+    if as_series:
+        return results
+    else:
+        # ensure that win, loss, and push are in the results index
+        for result in ["win", "loss", "push"]:
+            if not result in results.index:
+                results[result] = 0
+        return results["win"], results["loss"], results["push"]
+
+
+def detailed_results_pct(data):
+    """
+    """
+    # make a copy od the data since we'll be modifying it
+    data = copy.deepcopy(data)
+    if isinstance(data, list):
+        data = pd.DataFrame(data)
+    # find probability of each event
+    # winning options
+    data["detailed_results"] = np.where(
+        data["result"] == "win", np.where(
+            data["blackjack"] == 0, np.where(
+                data["double_down"] == 0, "win_no_bj_no_double",
+                "win_no_bj_double"
+            ), np.where(
+                data["from_split"] == 0, "win_blackjack", "win_blackjack_split"
+            )
+        ), ""
+    )
+    # losing options
+    data["detailed_results"] = np.where(
+        data["result"] == "loss", np.where(
+            data["dealer_blackjack"] == 0, np.where(
+                data["double_down"] == 0, "loss_no_dbj_no_double",
+                "loss_no_dbj_double"
+            ), "loss_dbj"
+        ), data["detailed_results"]
+    )
+    # pushes
+    data["detailed_results"] = np.where(
+        data["detailed_results"] == "", "push", data["detailed_results"]
+    )
+    pcts = data["detailed_results"].value_counts(normalize=True)
+    possible_results = [
+        "win_no_bj_no_double", "win_no_bj_double",
+        "win_blackjack", "loss_no_dbj_no_double", "loss_no_dbj_double",
+        "loss_dbj", "push", "win_blackjack_split"
+    ]
+    for result in possible_results:
+        if result not in pcts.index:
+            pcts[result] = 0
+
+    return pcts
 
 
 def result_heatmap(data, result="win", title=None,
@@ -34,7 +94,9 @@ def result_heatmap(data, result="win", title=None,
     sub_data = data[(data["dealer_blackjack"] == 0) &
                     (data["total"] <= 21)].copy()
     # calculate winning percentage for each total and dealer up card combo
-    grouped_pct = sub_data.groupby(["total", "dealer_up"]).apply(results_pct)
+    grouped_pct = sub_data.groupby(
+        ["total", "dealer_up"]
+    ).apply(results_pct, as_series=False)
     # unpack the tuple returned by groupby function and rename columns
     grouped_pct = grouped_pct.apply(pd.Series)
     grouped_pct.columns = ["win", "loss", "push"]
@@ -112,7 +174,7 @@ def outcome_bars(data, name=None, width=100):
         name = [f"Game{i}" for i in range(len(data))]
     plot_data_list = []  # list to hold dataframes that will be plotted
     for _name, _data in zip(name, data_list):
-        win, loss, push = results_pct(_data)
+        win, loss, push = results_pct(_data, as_series=False)
         plot_data_list.append(
             {"game": _name, "result": "Win", "pct": win, "order": 1},
         )
@@ -158,22 +220,21 @@ def house_edge(data, game_params):
     data: data from your simulations
     game_params: parameters from the game you simulated
     """
-    if isinstance(data, list):
-        data = pd.DataFrame(data)
-    # find probability of each event
-    _, loss_prob, push_prob = results_pct(data)
-    # separate winning events into blackjack and non-blackjack wins
-    num_hands = len(data)
-    blackjack_prob = len(data[data["blackjack"] == 1]) / num_hands
-    win_prob = (len(data[(data["blackjack"] == 0) &
-                         (data["result"] == "win")]) /
-                num_hands)
+    pcts = detailed_results_pct(data)
     # calculate expected payout
     expected_value = (
-        (game_params.payout * win_prob) +
-        (game_params.blackjack_payout * blackjack_prob) +
-        (-1 * loss_prob) +
-        (0 * push_prob)
+        (game_params.payout * pcts["win_no_bj_no_double"]) +
+        (game_params.payout * pcts["win_no_bj_double"] * 2) +
+        (game_params.blackjack_payout * pcts["win_blackjack"]) +
+        (game_params.split_blackjack_payout * pcts["win_blackjack_split"]) -
+        (pcts["loss_no_dbj_no_double"]) -
+        (pcts["loss_no_dbj_double"] * 2) -
+        (pcts["loss_dbj"])
+    )
+    print(
+        "Because all in-game situations may not occur during a simulation, "
+        "the expected value calculated should be interpreted as an "
+        "approximation"
     )
 
-    return expected_value * -1
+    return expected_value

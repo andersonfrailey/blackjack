@@ -160,3 +160,23 @@ Default Values: 3
 Possible Values: 1-9e+99
 
 Notes: Be warned that if you set this too high, there is the possibility that you go on a streak of split hands and run out of cards in the deck.
+
+## `split_blackjack_payout`
+
+Multiplicative payout for a blackjack after splitting your hand.
+
+Default Values: 1
+
+Possible Values: 0-9e+99
+
+Notes: N/A
+
+## `hit_split_aces`
+
+boolean indicator for whether a player is allowed to take additional cards after splitting aces.
+
+Default Values: False
+
+Possible Values: True, False
+
+Notes: N/A

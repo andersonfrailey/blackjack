@@ -57,4 +57,4 @@ def test_true_count():
     game.play_round()
     remaining_decks = len(game.deck) / 52
     true_count = game.count / remaining_decks
-    assert game.true_count == true_count
+    assert game.true_count == pytest.approx(true_count)
