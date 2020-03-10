@@ -242,7 +242,7 @@
     },
     "hit_split_aces": {
         "title": "Hit Split Aces",
-        "description": "boolean indicator for whether a player is allowed to take additional cards after splitting aces.",
+        "description": "Boolean indicator for whether a player is allowed to take additional cards after splitting aces.",
         "section_1": "Game",
         "section_2": "Player",
         "type": "bool",

@@ -94,6 +94,7 @@ class Player:
         blackjack_payout: payout for winning a hand with blackjack
         dealer_blackjack: boolean indicating whether or not the dealer had
             blackjack
+        split_bj_payout: payout for having a blackjack on a split hand
         Returns
         -------
         None
