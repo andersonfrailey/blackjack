@@ -173,7 +173,7 @@ Notes: N/A
 
 ## `hit_split_aces`
 
-boolean indicator for whether a player is allowed to take additional cards after splitting aces.
+Boolean indicator for whether a player is allowed to take additional cards after splitting aces.
 
 Default Values: False
 
