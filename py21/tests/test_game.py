@@ -4,6 +4,8 @@ Test suite for the game class
 # ignore no-member in pylist because it's raised for the game parameters
 # because pylint doesn't know about paramtools
 # pylint: disable=no-member
+import pandas as pd
+import numpy as np
 import pytest
 from py21 import Game, Player
 
@@ -58,3 +60,17 @@ def test_true_count():
     remaining_decks = len(game.deck) / 52
     true_count = game.count / remaining_decks
     assert game.true_count == pytest.approx(true_count)
+
+
+def test_data():
+    """
+    A few sanity check on the data we collect
+    """
+    p = Player(100)
+    game = Game([p])
+    game.simulate(100)
+    data = pd.DataFrame(p.history)
+    assert data["num_hard_aces"].min() >= 0
+    assert data["num_aces"].max() >= 0
+    assert np.all(data["num_hard_aces"] <= data["num_aces"])
+

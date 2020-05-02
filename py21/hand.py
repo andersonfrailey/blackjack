@@ -37,41 +37,50 @@ class Hand:
         self.double_down = False
         # this is used to determine whether to add 11 or 1 when delt an ace
         self.non_ace_total = 0
+        self.num_aces = 1 * self.soft
+        self.num_hard_aces = self.num_aces
 
     def add_card_two(self, card):
         """
         Add second card to hand.
         """
-        self.add_card(card)
+        # self.add_card(card)
+        self.cards.append(card)
+        self.total = card + self.total
+        if card.rank == 14:
+            self.num_aces += 1
+            self.num_hard_aces += 1
+            self.soft = True
+            if self.card_one.rank == 14:
+                self.total = 12
+                self.num_hard_aces -= 1
         self._check_blackjack()
 
     def add_card(self, card):
         """
-        Add a new card to the hand. Check the new total and see if busted.
+        Add a new card to the hand
         """
         if not isinstance(card, Card):
-            raise TypeError("'card' must be a Card object.")
-        # we're just not going to let people hit once they've reached 21
-        if self.total == 21 or self.bust:
-            msg = (
-                f"Hand total is {self.total}. You can't hit more once you've"
-                " reached 21 or busted.")
-            raise ValueError(msg)
-        # append the new card to the list of cards in the hand
+            raise TypeError("'card' must be a card object.")
+        # append new card to list of cards in the hand
         self.cards.append(card)
         self.total = card + self.total
-        start_soft = self.soft
+        # aces require a little more work
         if card.rank == 14:
-            setattr(self, "soft", True)
-        else:
-            self.non_ace_total += card.value
+            self.soft = True
+            self.num_aces += 1
+            self.num_hard_aces += 1
         # account for soft hands
-        if self.soft:
+        if self.total > 21 and self.soft:
+            self.total -= 10
+            self.num_hard_aces -= 1
+            self.soft = False
+            if self.num_hard_aces > 0:
+                self.soft = True
+            # catch the edge case where you're delt 12+ aces
             if self.total > 21:
                 self.total -= 10
-                self.soft = False
-                if card.rank == 14 and self.non_ace_total < 11:
-                    self.soft = True
+                self.num_hard_aces -= 1
         if self.total > 21:
             self.bust = True
 
@@ -79,27 +88,26 @@ class Hand:
         """
         This method returns a dictionary with data on the hand.
         """
-        try:
-            data = {
-                "total": self.total,
-                "card_one_value": self.cards[0].value,
-                "card_two_value": self.cards[1].value,
-                "card_one_rank": self.cards[0].rank,
-                "card_two_rank": self.cards[1].rank,
-                "cards": [card.rank for card in self.cards],
-                "soft": int(self.soft),
-                "from_split": int(self.from_split),
-                "blackjack": int(self.blackjack),
-                "num_cards": len(self.cards),
-                "start_total": self.cards[0] + self.cards[1],
-                "wager": int(self.wager),
-                "insurance": int(self.insurance),
-                "surrender": int(self.surrender),
-                "double_down": int(self.double_down)
-            }
-            return data
-        except IndexError:
-            import pdb; pdb.set_trace()
+        data = {
+            "total": self.total,
+            "card_one_value": self.cards[0].value,
+            "card_two_value": self.cards[1].value,
+            "card_one_rank": self.cards[0].rank,
+            "card_two_rank": self.cards[1].rank,
+            "cards": [card.rank for card in self.cards],
+            "soft": int(self.soft),
+            "from_split": int(self.from_split),
+            "blackjack": int(self.blackjack),
+            "num_cards": len(self.cards),
+            "start_total": self.cards[0] + self.cards[1],
+            "wager": int(self.wager),
+            "insurance": int(self.insurance),
+            "surrender": int(self.surrender),
+            "double_down": int(self.double_down),
+            "num_aces": self.num_aces,
+            "num_hard_aces": self.num_hard_aces
+        }
+        return data
 
     # Private methods of Card class
 

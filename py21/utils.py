@@ -212,29 +212,15 @@ def outcome_bars(data, name=None, width=100):
     return chart
 
 
-def house_edge(data, game_params):
+def house_edge(player):
     """
     Function for calculating house edge.
     Parameters
     ----------
-    data: data from your simulations
-    game_params: parameters from the game you simulated
+    player: an instance of the Player class whose house edge you want
+            to calculate
     """
-    pcts = detailed_results_pct(data)
-    # calculate expected payout
-    expected_value = (
-        (game_params.payout * pcts["win_no_bj_no_double"]) +
-        (game_params.payout * pcts["win_no_bj_double"] * 2) +
-        (game_params.blackjack_payout * pcts["win_blackjack"]) +
-        (game_params.split_blackjack_payout * pcts["win_blackjack_split"]) -
-        (pcts["loss_no_dbj_no_double"]) -
-        (pcts["loss_no_dbj_double"] * 2) -
-        (pcts["loss_dbj"])
-    )
-    print(
-        "Because all in-game situations may not occur during a simulation, "
-        "the expected value calculated should be interpreted as an "
-        "approximation"
-    )
+    winnings = player.bankroll - player.start_bankroll
+    total_wagered = player.total_wagered
 
-    return expected_value
+    return (winnings / total_wagered) * 100 * -1

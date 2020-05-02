@@ -29,6 +29,7 @@ class Deck:
 
         """
         del self.deck[:]
+        assert len(self.deck) == 0
         self.num_pop = 0
         self.num_creates += 1
         for decks in range(self.decks):
