@@ -44,16 +44,7 @@ class Hand:
         """
         Add second card to hand.
         """
-        # self.add_card(card)
-        self.cards.append(card)
-        self.total = card + self.total
-        if card.rank == 14:
-            self.num_aces += 1
-            self.num_hard_aces += 1
-            self.soft = True
-            if self.card_one.rank == 14:
-                self.total = 12
-                self.num_hard_aces -= 1
+        self.add_card(card)
         self._check_blackjack()
 
     def add_card(self, card):
@@ -75,12 +66,13 @@ class Hand:
             self.total -= 10
             self.num_hard_aces -= 1
             self.soft = False
-            if self.num_hard_aces > 0:
-                self.soft = True
             # catch the edge case where you're delt 12+ aces
             if self.total > 21:
                 self.total -= 10
                 self.num_hard_aces -= 1
+                self.soft = False
+            if self.num_hard_aces > 0:
+                self.soft = True
         if self.total > 21:
             self.bust = True
 

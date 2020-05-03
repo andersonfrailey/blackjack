@@ -73,4 +73,5 @@ def test_data():
     assert data["num_hard_aces"].min() >= 0
     assert data["num_aces"].max() >= 0
     assert np.all(data["num_hard_aces"] <= data["num_aces"])
+    assert np.all(data["num_aces"] <= data["num_cards"])
 

@@ -107,6 +107,5 @@ def test_soft():
     hand.add_card(Card(14, "S"))
     assert not hand.bust
     assert hand.total == 12
+    assert not hand.soft
     assert hand.num_hard_aces == 0
-    # with pytest.raises(ValueError):
-    #     hand.add_card(Card(14, "S"))
