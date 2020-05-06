@@ -355,7 +355,7 @@ class Game:
             elif action == "DOUBLE":
                 # can only double in your first move
                 allowed = (len(hand.cards) == 2 and
-                            hand.player.bankroll >= hand.wager)
+                           hand.player.bankroll >= hand.wager)
                 # not all games allow you to double split hands
                 if hand.from_split:
                     allowed = self.game_params.double_after_split
