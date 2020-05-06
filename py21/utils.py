@@ -24,7 +24,7 @@ def results_pct(data, as_series=True):
     else:
         # ensure that win, loss, and push are in the results index
         for result in ["win", "loss", "push"]:
-            if not result in results.index:
+            if result not in results.index:
                 results[result] = 0
         return results["win"], results["loss"], results["push"]
 
@@ -182,7 +182,7 @@ def outcome_bars(data, name=None, width=100):
             {"game": _name, "result": "Loss", "pct": loss, "order": 2}
         )
         plot_data_list.append(
-         {"game": _name, "result": "Push", "pct": push, "order": 3} 
+         {"game": _name, "result": "Push", "pct": push, "order": 3}
         )
     plot_data = pd.DataFrame(plot_data_list)
 
