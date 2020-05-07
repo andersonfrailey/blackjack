@@ -1,7 +1,6 @@
 """
 Test utils module of Py21
 """
-import altair as alt
 import pandas as pd
 import pytest
 from py21.utils import (results_pct, result_heatmap, outcome_bars, house_edge,
@@ -14,10 +13,8 @@ def test_charts(basic_player):
     game.simulate(10000)
     # heatmap
     chart = result_heatmap(basic_player.history)
-    assert isinstance(chart, alt.vegalite.v3.api.Chart)
     # outcome bars
     chart = outcome_bars(basic_player.history)
-    assert isinstance(chart, alt.vegalite.v3.api.Chart)
 
 
 def test_results_pct(basic_player):
