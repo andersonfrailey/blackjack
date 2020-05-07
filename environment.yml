@@ -6,4 +6,5 @@ dependencies:
 - paramtools
 - pytest
 - pandas
-- altair==3.2.0
+- altair
+# an optional requirement, pyyaml, is used to generate requirements.txt

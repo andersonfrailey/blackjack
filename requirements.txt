@@ -1,0 +1,8 @@
+# This file is auto-generated from environment.yml, do not modify.
+# See that file for comments about the need/usage of each dependency.
+
+tqdm
+paramtools
+pytest
+pandas
+altair
