@@ -252,5 +252,18 @@
                 "choices": [true, false]
             }
         }
+    },
+    "burn": {
+        "title": "Burn First Card",
+        "description": "Boolean indicator for whether to burn the first card of a new deck or not.",
+        "section_1": "Game",
+        "section_2": "Deck",
+        "type": "bool",
+        "value": true,
+        "validators": {
+            "choice": {
+                "choices": [true, false]
+            }
+        }
     }
 }

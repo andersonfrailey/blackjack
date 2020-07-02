@@ -10,7 +10,10 @@ class Card:
 
     def __init__(self, rank, suit):
         """
-        Each card has a rank, suit, and value
+        Parameters
+        ----------
+        rank: rank of card
+        suit: suit of card
         """
         if rank in Card.RANKS:
             self.rank = rank
