@@ -180,3 +180,13 @@ Default Values: False
 Possible Values: True, False
 
 Notes: N/A
+
+## `burn`
+
+Boolean indicator for whether to burn the first card of a new deck or not.
+
+Default Values: True
+
+Possible Values: True, False
+
+Notes: N/A

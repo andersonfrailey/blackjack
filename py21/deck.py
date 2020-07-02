@@ -6,12 +6,20 @@ from .card import Card
 
 class Deck:
 
-    def __init__(self, decks, test=False):
+    def __init__(self, decks, test=False, burn=True):
         """
         Initialize Deck class and create the first deck
+        Parameters
+        ----------
+        decks: number of decks to create
+        test: boolean indicator for whether we should create the deck used for
+              testing
+        burn: boolean indicator for whether we burn the first card of a new
+              deck
         """
         self.deck = []
         self.decks = decks
+        self.burn = burn
         self.num_creates = 0
         if test:
             self._create_test_deck()
@@ -41,8 +49,11 @@ class Deck:
             msg = 'Full deck not created'
             raise ValueError(msg)
         self.shuffle()
+        assert len(self.deck) == 52 * self.decks
         # reset count variables
         setattr(self, "hands_played", 0)
+        if self.burn:
+            self.deal()
 
     def shuffle(self):
         """
@@ -85,7 +96,7 @@ class Deck:
         """
         # this deck is created to ensure that the player will need to split
         # their hand
-        test_ranks = [2, 6, 4, 6, 9, 8, 2, 12, 3, 13, 5, 4, 10, 11]
+        test_ranks = [6, 4, 6, 9, 8, 2, 12, 3, 13, 5, 4, 10, 11]
         for rank in test_ranks:
             self.deck.append(Card(rank, "C"))
 

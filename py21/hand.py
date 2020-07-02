@@ -12,6 +12,16 @@ class Hand:
         This class handles all of the logic for individual hads. It is
         initiated by passing in two cards that will are the starting cards,
         and a Player object that is the player who is playing the hand.
+
+        Parameters
+        ----------
+        card_one: first card in the hand
+        from_split: boolean indicator for if the hand was delt after splitting
+                    a pair
+        player: an instance of a player object that represents which player
+                was delt this hand
+        **kwargs: arguments that get passed to functions called in the hand
+                  class such as the wager function of the player
         """
         if isinstance(card_one, Card):
             self.card_one = card_one

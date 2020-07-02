@@ -46,7 +46,9 @@ class Game:
                 raise TypeError("'rules' must be a dictionary.")
             self._update_params(self.rules)
         self.num_decks = self.game_params.num_decks
-        self.deck = Deck(self.num_decks, test=test)
+        self.deck = Deck(
+            self.num_decks, test=test, burn=self.game_params.burn
+        )
         self.count = 0
         self.ten_count = 16 * self.num_decks  # count of tens seen
         self.other_count = 36 * self.num_decks  # count of non-tens seens
@@ -58,10 +60,8 @@ class Game:
 
         # variables for data collection
         self.hit_results = []
+        self.count_data = []
         self.round_id = 1
-
-        # burn first card
-        self.deck.deal()
 
         # list to hold completed hands. Will be cleared after each round
         self._completed_hands = []
@@ -137,6 +137,7 @@ class Game:
                 print(f"Wager: {hand.wager}")
             if dealer.blackjack:
                 print("Dealer Blackjack")
+                self._count(dealer.cards[1])
                 for hand in hands:
                     self._completed_hands.append(hand)
         # check for dealer blackjack
@@ -201,9 +202,7 @@ class Game:
         del self._completed_hands[:]
         # check if the deck should be shuffled
         new_deck = self.deck.check_status(self.game_params.shuffle_freq)
-        # burn first card
         if new_deck:
-            self.deck.deal()
             setattr(self, "count", 0)
             setattr(self, "ten_count", 16 * self.num_decks)
             setattr(self, "other_count", 36 * self.num_decks)
@@ -460,6 +459,10 @@ class Game:
         """
         Count cards as they're delt
         """
+        pre_count = self.count
+        pre_ten_count = self.ten_count
+        pre_true_count = self.true_count
+        pre_other_count = self.other_count
         if 2 <= card.value <= 6:
             self.count += 1
         elif card.value >= 10:
@@ -470,3 +473,16 @@ class Game:
         # update true count
         remaining_decks = len(self.deck) / 52
         self.true_count = self.count / remaining_decks
+        self.count_data.append(
+            {
+                "pre_count": pre_count,
+                "post_count": self.count,
+                "pre_ten_count": pre_ten_count,
+                "post_ten_count": self.ten_count,
+                "pre_true_count": pre_true_count,
+                "post_true_count": self.true_count,
+                "pre_other_count": pre_other_count,
+                "post_other_count": self.other_count,
+                "card_value": card.value
+            }
+        )
