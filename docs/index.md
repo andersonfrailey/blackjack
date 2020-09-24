@@ -21,6 +21,8 @@ The `Game` object takes one required argument and two optional ones:
 * `rules`: dictionary containing updates to the game's rules (optional)
 * `verbose`: True/False for whether or not you want output to be printed while
   the game is being played (optional)
+* `test`: creates a fake deck that is used for testing the code
+* `seed`: optional seed for the random number generator
 
 ```python
 from py21 import Game, Player

@@ -24,7 +24,8 @@ class GameParams(Parameters):
 
 class Game:
 
-    def __init__(self, players, rules=None, verbose=False, test=False):
+    def __init__(self, players, rules=None, verbose=False, test=False,
+                 seed=None):
         """
         Parameters
         ----------
@@ -47,7 +48,7 @@ class Game:
             self._update_params(self.rules)
         self.num_decks = self.game_params.num_decks
         self.deck = Deck(
-            self.num_decks, test=test, burn=self.game_params.burn
+            self.num_decks, test=test, burn=self.game_params.burn, seed=seed
         )
         self.count = 0
         self.ten_count = 16 * self.num_decks  # count of tens seen

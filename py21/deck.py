@@ -6,7 +6,15 @@ from .card import Card
 
 class Deck:
 
-    def __init__(self, decks, test=False, burn=True):
+    def __new__(cls, *args, **kwargs):
+        """
+        Allow a random seed to be set
+        """
+        cls._seed = kwargs.get("seed", None)
+        cls.random = random.Random(cls._seed)
+        return object.__new__(cls)
+
+    def __init__(self, decks, test=False, burn=True, **kwargs):
         """
         Initialize Deck class and create the first deck
         Parameters
@@ -59,7 +67,7 @@ class Deck:
         """
         Shuffle the deck
         """
-        random.shuffle(self.deck)
+        self.random.shuffle(self.deck)
 
     def deal(self):
         """
