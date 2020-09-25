@@ -1,3 +1,8 @@
+[![PyPI version fury.io](https://badge.fury.io/py/py21.svg)](https://pypi.python.org/pypi/py21/)
+[![PyPi downloads](https://pypip.in/d/py21/badge.png)](https://crate.io/packages/$REPO/)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
+
+
 # Blackjack
 
 `py21` is a blackjack simulator. Users can run the simulation using the
