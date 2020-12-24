@@ -35,7 +35,7 @@ def test_settle_up():
         "from_split": False,
         "result": "win"
     }
-    p.settle_up(hand_data, 17, "win", 1, 1.5, False, 1)
+    p.settle_up(hand_data, 17, "win", 1, 1.5, False, 1, 0.5)
     assert p.bankroll == 105
     # blackjack payout
     hand_data = {
@@ -45,7 +45,7 @@ def test_settle_up():
         "from_split": False,
         "result": "win"
     }
-    p.settle_up(hand_data, 17, "win", 1, 1.5, False, 1)
+    p.settle_up(hand_data, 17, "win", 1, 1.5, False, 1, 0.5)
     assert p.bankroll == 117.5
     # split blackjack payout
     hand_data = {
@@ -55,7 +55,7 @@ def test_settle_up():
         "from_split": True,
         "result": "win"
     }
-    p.settle_up(hand_data, 17, "win", 1, 1.5, False, 1.5)
+    p.settle_up(hand_data, 17, "win", 1, 1.5, False, 1.5, 0.5)
     assert p.bankroll == 130
     # insurance payout
     hand_data = {
@@ -65,7 +65,7 @@ def test_settle_up():
         "from_split": False,
         "result": "win"
     }
-    p.settle_up(hand_data, 17, "loss", 1, 1.5, True, 1)
+    p.settle_up(hand_data, 17, "loss", 1, 1.5, True, 1, 0.5)
     assert p.bankroll == 135
     # push
     hand_data = {
@@ -75,5 +75,16 @@ def test_settle_up():
         "from_split": False,
         "result": "win"
     }
-    p.settle_up(hand_data, 17, "push", 1, 1.5, False, 1)
+    p.settle_up(hand_data, 17, "push", 1, 1.5, False, 1, 0.5)
     assert p.bankroll == 140
+    # surrender
+    hand_data = {
+        "wager": 5,
+        "insurance": False,
+        "blackjack": False,
+        "from_split": False,
+        "surrender": True,
+        "result": "surrender"
+    }
+    p.settle_up(hand_data, 17, "surrender", 1, 1.5, False, 1, 0.5)
+    assert p.bankroll == 142.5

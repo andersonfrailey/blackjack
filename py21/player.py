@@ -83,7 +83,8 @@ class Player:
         return action
 
     def settle_up(self, hand_data, dealer_total, result, payout,
-                  blackjack_payout, dealer_blackjack, split_bj_payout):
+                  blackjack_payout, dealer_blackjack, split_bj_payout,
+                  surrender_pct):
         """
         This method logs all of the data for a given hand.
         Parameters
@@ -95,6 +96,7 @@ class Player:
         dealer_blackjack: boolean indicating whether or not the dealer had
             blackjack
         split_bj_payout: payout for having a blackjack on a split hand
+        surrender_pct: percentage of your bet you get back after surrendering
         Returns
         -------
         None
@@ -122,6 +124,8 @@ class Player:
         elif result == "push":
             # add back wager if they push
             self.bankroll += wager
+        elif result == "surrender":
+            self.bankroll += wager * surrender_pct
         additonal_data["end_bankroll"] = self.bankroll
         # return from betting the player has gotten
         self.roi = (self.bankroll - self.start_bankroll) / self.total_wagered
