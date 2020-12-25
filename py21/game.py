@@ -352,7 +352,7 @@ class Game:
                     )
                     # exit loop
                     break
-            elif action == "DOUBLE":
+            elif action.startswith("DOUBLE"):
                 # can only double in your first move
                 allowed = (len(hand.cards) == 2 and
                            hand.player.bankroll >= hand.wager)
@@ -370,12 +370,15 @@ class Game:
                     setattr(hand, "wager", hand.wager * 2)
                 # if not allowed to double, just hit
                 else:
-                    action = "HIT"
+                    if action.endswith("HIT"):
+                        action = "HIT"
+                    elif action.endswith("STAND"):
+                        setattr(hand, "stand", True)
             elif action == "SURRENDER":
                 # only allow surrender if they player hasn't taken a
                 # card yet and if the game rules allow
                 allowed = (
-                    self.game_params.surrender_allowed &
+                    self.game_params.surrender_allowed and
                     len(hand.cards) == 2
                 )
                 if hand.from_split and allowed:
@@ -434,25 +437,35 @@ class Game:
             if hand.bust:
                 hand.player.settle_up(hand_data, dealer.total,
                                       "loss", payout, blackjack_payout,
-                                      dealer.blackjack, split_bj_payout)
+                                      dealer.blackjack, split_bj_payout,
+                                      self.game_params.surrender_pct)
+            elif hand.surrender:
+                hand.player.settle_up(hand_data, dealer.total,
+                                      "surrender", payout, blackjack_payout,
+                                      dealer.blackjack, split_bj_payout,
+                                      self.game_params.surrender_pct)
             elif dealer.bust:
                 hand.player.settle_up(hand_data, dealer.total,
                                       "win", payout, blackjack_payout,
-                                      dealer.blackjack, split_bj_payout)
+                                      dealer.blackjack, split_bj_payout,
+                                      self.game_params.surrender_pct)
             elif hand > dealer:
                 hand.player.settle_up(hand_data, dealer.total,
                                       "win", payout, blackjack_payout,
-                                      dealer.blackjack, split_bj_payout)
+                                      dealer.blackjack, split_bj_payout,
+                                      self.game_params.surrender_pct)
             elif hand < dealer:
                 hand.player.settle_up(hand_data, dealer.total,
                                       "loss", payout, blackjack_payout,
-                                      dealer.blackjack, split_bj_payout)
+                                      dealer.blackjack, split_bj_payout,
+                                      self.game_params.surrender_pct)
             else:
                 if self.verbose:
                     print("Push")
                 hand.player.settle_up(hand_data, dealer.total,
                                       "push", payout, blackjack_payout,
-                                      dealer.blackjack, split_bj_payout)
+                                      dealer.blackjack, split_bj_payout,
+                                      self.game_params.surrender_pct)
             if self.verbose:
                 print(f"Player Bankroll: {hand.player.bankroll}\n")
 

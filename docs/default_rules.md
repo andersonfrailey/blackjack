@@ -190,3 +190,13 @@ Default Values: True
 Possible Values: True, False
 
 Notes: N/A
+
+## `surrender_pct`
+
+Percentage of the original wager a player gets back after surrendering.
+
+Default Values: 0.5
+
+Possible Values: 0-1
+
+Notes: N/A
