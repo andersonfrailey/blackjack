@@ -45,11 +45,20 @@ def basic_strategy(player, hand, dealer_up, game_params, **kwargs):
     # strategy for splits
     if (hand.cards[0].value == hand.cards[1].value) and len(hand.cards) == 2:
         action = BASIC_SPLIT[str(dealer_up)][hand.cards[0].value]
-        if action == "Y":
+        if action == "P":
             return "SPLIT"
-        elif action == "Y/N":
+        elif action == "Ph":
             if game_params.double_after_split:
                 return "SPLIT"
+            else:
+                return "HIT"
+        elif action == "Rp":
+            if game_params.surrender_allowed:
+                return "SURRENDER"
+            else:
+                return "SPLIT"
+        elif action == "S":
+            return "STAND"
     # strategy for hard hands
     if not hand.soft:
         action = BASIC_HARD[str(dealer_up)][hand.total]
@@ -61,8 +70,23 @@ def basic_strategy(player, hand, dealer_up, game_params, **kwargs):
         return "HIT"
     elif action == "S":
         return "STAND"
-    elif action == "D" or action == "Ds":
-        return "DOUBLE"
+    elif action == "Dh":
+        return "DOUBLE-HIT"
+    elif action == "Ds":
+        return "DOUBLE-STAND"
+    elif action == "Rh":
+        if len(hand.cards) == 2 and game_params.surrender_allowed:
+            return "SURRENDER"
+        else:
+            return "HIT"
+    elif action == "Rs":
+        if len(hand.cards) == 2 and game_params.surrender_allowed:
+            return "SURRENDER"
+        else:
+            return "STAND"
+    else:
+        msg = f"{action} does not have associated action"
+        raise ValueError(msg)
 
 
 def user_input(player, hand, dealer_up, count, ten_count, other_count,

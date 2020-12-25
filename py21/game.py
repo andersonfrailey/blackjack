@@ -352,7 +352,7 @@ class Game:
                     )
                     # exit loop
                     break
-            elif action == "DOUBLE":
+            elif action.startswith("DOUBLE"):
                 # can only double in your first move
                 allowed = (len(hand.cards) == 2 and
                            hand.player.bankroll >= hand.wager)
@@ -370,7 +370,10 @@ class Game:
                     setattr(hand, "wager", hand.wager * 2)
                 # if not allowed to double, just hit
                 else:
-                    action = "HIT"
+                    if action.endswith("HIT"):
+                        action = "HIT"
+                    elif action.endswith("STAND"):
+                        setattr(hand, "stand", True)
             elif action == "SURRENDER":
                 # only allow surrender if they player hasn't taken a
                 # card yet and if the game rules allow
