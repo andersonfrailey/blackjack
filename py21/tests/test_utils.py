@@ -36,5 +36,6 @@ def test_detailed_results_pct(basic_player):
 
 
 def test_house_edge(basic_player):
-    edge = house_edge(basic_player)
+    g = Game([basic_player])
+    edge = house_edge(basic_player, g.game_params)
     assert isinstance(edge, float)

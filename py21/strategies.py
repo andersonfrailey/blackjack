@@ -75,12 +75,18 @@ def basic_strategy(player, hand, dealer_up, game_params, **kwargs):
     elif action == "Ds":
         return "DOUBLE-STAND"
     elif action == "Rh":
-        if len(hand.cards) == 2 and game_params.surrender_allowed:
+        allowed = len(hand.cards) == 2 and game_params.surrender_allowed
+        if hand.from_split:
+            allowed = game_params.surrender_after_split
+        if allowed:
             return "SURRENDER"
         else:
             return "HIT"
     elif action == "Rs":
-        if len(hand.cards) == 2 and game_params.surrender_allowed:
+        allowed = len(hand.cards) == 2 and game_params.surrender_allowed
+        if hand.from_split:
+            allowed = game_params.surrender_after_split
+        if allowed:
             return "SURRENDER"
         else:
             return "STAND"

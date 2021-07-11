@@ -218,7 +218,7 @@ def outcome_bars(data, name=None, width=100):
     return chart
 
 
-def house_edge(player):
+def house_edge(player, params):
     """
     Function for calculating house edge.
     Parameters
@@ -226,7 +226,28 @@ def house_edge(player):
     player: an instance of the Player class whose house edge you want
             to calculate
     """
-    winnings = player.bankroll - player.start_bankroll
-    total_wagered = player.total_wagered
+    data = pd.DataFrame(player.history)
+    results = np.where(
+        np.logical_and(data["result"] == "win", data["blackjack"]),
+        "blackjack", data['result']
+    )
+    results = pd.Series(np.where(
+        np.logical_and(data["double_down"], data["result"] == "win"),
+        "double", results
+    )).value_counts(normalize=True)
 
-    return (winnings / total_wagered) * 100 * -1
+    ev = (
+        params.payout * results["win"] +
+        (params.blackjack_payout * results["blackjack"]) +
+        (2 * results["double"]) -
+        results["loss"] -
+        (params.surrender_pct * results["surrender"])
+    )
+
+    print(
+        "Because all in-game situations may not occur during a simulation, "
+        "the expected value calculated should be interpreted as an "
+        "approximation"
+    )
+
+    return ev

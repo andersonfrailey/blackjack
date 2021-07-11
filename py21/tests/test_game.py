@@ -49,8 +49,8 @@ def test_game_implementation():
 
 
 def test_simulation():
-    game = Game([Player(100)])
-    game.simulate(10)
+    game = Game([Player(1000)])
+    game.simulate(1000)
 
 
 def test_true_count():

@@ -367,7 +367,8 @@ class Game:
                     # double the player's bet
                     hand.player.bankroll -= hand.wager
                     hand.player.total_wagered += hand.wager
-                    setattr(hand, "wager", hand.wager * 2)
+                    hand.wager *= 2
+                    action = "DOUBLE"
                 # if not allowed to double, just hit
                 else:
                     if action.endswith("HIT"):
@@ -384,6 +385,8 @@ class Game:
                 if hand.from_split and allowed:
                     allowed = self.game_params.surrender_after_split
                 if allowed:
+                    if self.verbose:
+                        print("Surrendering")
                     setattr(hand, "surrender", True)
                 else:
                     raise ValueError(
