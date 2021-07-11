@@ -265,5 +265,19 @@
                 "choices": [true, false]
             }
         }
+    },
+    "surrender_pct": {
+        "title": "Surrender Percentage",
+        "description": "Percentage of the original wager a player gets back after surrendering.",
+        "section_1": "Game",
+        "section_2": "Surrender",
+        "type": "float",
+        "value": 0.5,
+        "validators": {
+            "range": {
+                "min": 0,
+                "max": 1
+            }
+        }
     }
 }

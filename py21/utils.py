@@ -23,10 +23,12 @@ def results_pct(data, as_series=True):
         return results
     else:
         # ensure that win, loss, and push are in the results index
-        for result in ["win", "loss", "push"]:
+        for result in ["win", "loss", "push", "surrender"]:
             if result not in results.index:
                 results[result] = 0
-        return results["win"], results["loss"], results["push"]
+        return (
+            results["win"], results["loss"], results["push"], results["surrender"]
+        )
 
 
 def detailed_results_pct(data):
@@ -81,7 +83,8 @@ def result_heatmap(data, result="win", title=None,
     showing their winning percentage based on their hand totals and the
     dealer's up card
     """
-    assert result in ["win", "loss", "push"], (
+    possible_results = ["win", "loss", "push", "surrender"]
+    assert result in possible_results, (
         "'result' must be 'win', 'loss', or 'push'"
     )
     if not title:
@@ -99,12 +102,12 @@ def result_heatmap(data, result="win", title=None,
     ).apply(results_pct, as_series=False)
     # unpack the tuple returned by groupby function and rename columns
     grouped_pct = grouped_pct.apply(pd.Series)
-    grouped_pct.columns = ["win", "loss", "push"]
+    grouped_pct.columns = possible_results
     # reset index and sort for plotting
     pct_data = grouped_pct.reset_index().sort_values("total", ascending=False)
     # dynamically determine how the legend should be labeled
-    min_val = round(min(pct_data[["win", "loss", "push"]].min()), 1)
-    max_val = round(max(pct_data[["win", "loss", "push"]].max()), 1)
+    min_val = round(min(pct_data[possible_results].min()), 1)
+    max_val = round(max(pct_data[possible_results].max()), 1)
     min_int = int(min_val * 10)
     max_int = int(max_val * 10)
     values = [
@@ -174,7 +177,7 @@ def outcome_bars(data, name=None, width=100):
         name = [f"Game{i}" for i in range(len(data))]
     plot_data_list = []  # list to hold dataframes that will be plotted
     for _name, _data in zip(name, data_list):
-        win, loss, push = results_pct(_data, as_series=False)
+        win, loss, push, surrender = results_pct(_data, as_series=False)
         plot_data_list.append(
             {"game": _name, "result": "Win", "pct": win, "order": 1},
         )
@@ -182,7 +185,10 @@ def outcome_bars(data, name=None, width=100):
             {"game": _name, "result": "Loss", "pct": loss, "order": 2}
         )
         plot_data_list.append(
-         {"game": _name, "result": "Push", "pct": push, "order": 3}
+            {"game": _name, "result": "Push", "pct": push, "order": 3}
+        )
+        plot_data_list.append(
+            {"game": _name, "result": "Surrender", "pct": surrender, "order": 3}
         )
     plot_data = pd.DataFrame(plot_data_list)
 
@@ -212,7 +218,7 @@ def outcome_bars(data, name=None, width=100):
     return chart
 
 
-def house_edge(player):
+def house_edge(player, params):
     """
     Function for calculating house edge.
     Parameters
@@ -220,7 +226,28 @@ def house_edge(player):
     player: an instance of the Player class whose house edge you want
             to calculate
     """
-    winnings = player.bankroll - player.start_bankroll
-    total_wagered = player.total_wagered
+    data = pd.DataFrame(player.history)
+    results = np.where(
+        np.logical_and(data["result"] == "win", data["blackjack"]),
+        "blackjack", data['result']
+    )
+    results = pd.Series(np.where(
+        np.logical_and(data["double_down"], data["result"] == "win"),
+        "double", results
+    )).value_counts(normalize=True)
 
-    return (winnings / total_wagered) * 100 * -1
+    ev = (
+        params.payout * results["win"] +
+        (params.blackjack_payout * results["blackjack"]) +
+        (2 * results["double"]) -
+        results["loss"] -
+        (params.surrender_pct * results["surrender"])
+    )
+
+    print(
+        "Because all in-game situations may not occur during a simulation, "
+        "the expected value calculated should be interpreted as an "
+        "approximation"
+    )
+
+    return ev

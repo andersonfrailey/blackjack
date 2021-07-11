@@ -20,11 +20,11 @@ def test_charts(basic_player):
 def test_results_pct(basic_player):
     data = pd.DataFrame(basic_player.history)
     results = results_pct(data)
-    assert 1 <= len(results) <= 3
+    assert 1 <= len(results) <= 4
     assert results.sum() == pytest.approx(1.0)
     # test when results are returned as a tuple
     results = results_pct(data, as_series=False)
-    assert len(results) == 3
+    assert len(results) == 4
     assert sum(results) == pytest.approx(1.0)
 
 
@@ -36,5 +36,6 @@ def test_detailed_results_pct(basic_player):
 
 
 def test_house_edge(basic_player):
-    edge = house_edge(basic_player)
+    g = Game([basic_player])
+    edge = house_edge(basic_player, g.game_params)
     assert isinstance(edge, float)

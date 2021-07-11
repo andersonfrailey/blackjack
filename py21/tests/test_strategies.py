@@ -13,7 +13,7 @@ def test_insurance():
 
 def test_basic_strategy(basic_player, basic_hand):
     action = basic_strategy(basic_player, basic_hand, 7, None)
-    assert action == "DOUBLE"
+    assert action == "DOUBLE-HIT"
 
 
 def test_hit_to_seventeen(basic_player, basic_hand):

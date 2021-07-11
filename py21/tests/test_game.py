@@ -30,15 +30,15 @@ def test_game_implementation():
     # ensure surrender throws and error if not allowed
     # decided this test just isn't relevant right now. will bring back
     # when I figure out a better implementation
-    # rules = {"surrender_allowed": False}
+    rules = {"surrender_allowed": False}
 
-    # def surrender(**kwargs):
-    #     return "SURRENDER"
+    def surrender(**kwargs):
+        return "SURRENDER"
 
-    # player = Player(100, strategy_func=surrender)
-    # game = Game([player], rules=rules)
-    # with pytest.raises(ValueError):
-    #     game.play_round()
+    player = Player(100, strategy_func=surrender)
+    game = Game([player], rules=rules)
+    with pytest.raises(ValueError):
+        game.play_round()
 
     # test split and count implementations
     rules = {"shuffle_freq": 0}
@@ -49,8 +49,8 @@ def test_game_implementation():
 
 
 def test_simulation():
-    game = Game([Player(100)])
-    game.simulate(10)
+    game = Game([Player(1000)])
+    game.simulate(1000)
 
 
 def test_true_count():
