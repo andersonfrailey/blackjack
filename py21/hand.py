@@ -135,3 +135,9 @@ class Hand:
             raise TypeError("Hand objects can only be compared to other "
                             "Hand objects.")
         return self.total == other.total
+
+    def __str__(self) -> str:
+        return (
+            " ".join([str(card) for card in self.cards]) +
+            f"\nTotal: {self.total}"
+        )
