@@ -360,7 +360,10 @@ class Game:
                     allowed = self.game_params.double_after_split
                 if not allowed:
                     raise ValueError(
-                        "Doubling Down is not allowed here"
+                        "Doubling Down is not allowed here",
+                        f"Hand length: {(len(hand.cards))}",
+                        f"Sufficient bank: {hand.player.bankroll > hand.wager}",
+                        f"Double after split: {self.game_params.double_after_split}"
                     )
                 # flag hand as a double down
                 setattr(hand, "double_down", True)
