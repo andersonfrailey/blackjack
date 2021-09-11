@@ -421,7 +421,8 @@ class Game:
         additional_data = {
             "round_id": self.round_id,
             "dealer_blackjack": int(dealer.blackjack),
-            "dealer_up": dealer.card_one.value
+            "dealer_up": dealer.card_one.value,
+            "dealer_cards": " ".join([str(card) for card in dealer.cards])
         }
         for hand in self._completed_hands:
             hand_data = {**hand.summary_data(), **additional_data}

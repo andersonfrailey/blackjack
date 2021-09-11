@@ -50,15 +50,16 @@ def cli_main():
             print("\nBlackjack!")
         if results["dealer_blackjack"]:
             print("\nDealer had blackjack :(")
-        print(f"\nFinal total: {results['total']}")
+        print(f"\nYour final hand: {results['cards']}")
+        print(f"Final total: {results['total']}")
         print(f"Dealter total: {results['dealer_total']}")
         print(f"Hand result: {results['result']}")
         _continue = input("Play again? (y/n) ")
         total_hands += 1
     # summarize the results
-    print(f"Total hands played: {total_hands}")
+    print(f"\nTotal hands played: {total_hands}")
     correct_pct = (correct / total_moves) * 100
-    print(f"You made the right move {correct_pct:.2f}% of the time")
+    print(f"According to basic strategy, you made the right move {correct_pct:.2f}% of the time")
     print(f"You started with ${player.start_bankroll}...")
     print(f"and finished with ${player.bankroll}")
 
@@ -68,7 +69,9 @@ def strategy(player, hand, dealer_up, game_params, **kwargs):
     print(f"\nDealer shows: {dealer_up}")
     print("Your hand: ", hand)
     valid = False
-    options = ["H", "S", "D", "R", "Sp"]
+    options = [
+        "Hit (H)", "Stand (S)", "Double Down (D)", "Surrender (R)", "Split (Sp)"
+    ]
     while not valid:
         print(f"Options: {options}")
         action = input("What would you like to do? ").upper()
@@ -78,7 +81,7 @@ def strategy(player, hand, dealer_up, game_params, **kwargs):
         player, hand, dealer_up, game_params, **kwargs
     )
     if action == BASIC_MAP[basic_strat]:
-        print("That's the right move!")
+        print("Basic strategy says that's the right move!")
         correct += 1
     else:
         print(f"Basic strategy says to {basic_strat} instead")
@@ -88,7 +91,7 @@ def strategy(player, hand, dealer_up, game_params, **kwargs):
 
 
 def wager(player, min_bet, max_bet, **kwargs):
-    print(f"Minimum bet: {min_bet}")
+    print(f"\nMinimum bet: {min_bet}")
     print(f"Maximum bet: {max_bet}")
     print(f"Your bankroll: {player.bankroll}")
     valid = False
@@ -154,7 +157,7 @@ def validate_action(action, hand, game_params):
         if len(hand.cards) != 2:
             print("You can only split your first two cards")
             return False
-    elif action.upper() == "RH":
+    elif action.upper() == "R":
         if len(hand.cards) != 2:
             print("You can only surrender at the start of the hand")
             return False
