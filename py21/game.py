@@ -352,29 +352,27 @@ class Game:
                     )
                     # exit loop
                     break
-            elif action.startswith("DOUBLE"):
-                # can only double in your first move
-                allowed = (len(hand.cards) == 2 and
-                           hand.player.bankroll >= hand.wager)
-                # not all games allow you to double split hands
-                if hand.from_split:
+            elif action == "DOUBLE":
+                allowed = (
+                    len(hand.cards) == 2 and hand.player.bankroll > hand.wager
+                )
+                if hand.from_split and allowed:
                     allowed = self.game_params.double_after_split
-                # if allowed, you must stand after doubling down
-                if allowed:
-                    # flag hand as a double down
-                    setattr(hand, "double_down", True)
-                    setattr(hand, "stand", True)
-                    # double the player's bet
-                    hand.player.bankroll -= hand.wager
-                    hand.player.total_wagered += hand.wager
-                    hand.wager *= 2
-                    action = "DOUBLE"
-                # if not allowed to double, just hit
-                else:
-                    if action.endswith("HIT"):
-                        action = "HIT"
-                    elif action.endswith("STAND"):
-                        setattr(hand, "stand", True)
+                if not allowed:
+                    raise ValueError(
+                        "Doubling Down is not allowed here",
+                        f"Hand length: {(len(hand.cards))}",
+                        f"Sufficient bank: {hand.player.bankroll > hand.wager}",
+                        f"Double after split: {self.game_params.double_after_split}"
+                    )
+                # flag hand as a double down
+                setattr(hand, "double_down", True)
+                setattr(hand, "stand", True)
+                # double the player's bet
+                hand.player.bankroll -= hand.wager
+                hand.player.total_wagered += hand.wager
+                hand.wager *= 2
+                action = "DOUBLE"
             elif action == "SURRENDER":
                 # only allow surrender if they player hasn't taken a
                 # card yet and if the game rules allow
@@ -390,7 +388,7 @@ class Game:
                     setattr(hand, "surrender", True)
                 else:
                     raise ValueError(
-                        "Surrender is not allowed"
+                        "Surrender is not allowed here"
                     )
                 continue
             if action == "HIT" or action == "DOUBLE":
@@ -426,7 +424,8 @@ class Game:
         additional_data = {
             "round_id": self.round_id,
             "dealer_blackjack": int(dealer.blackjack),
-            "dealer_up": dealer.card_one.value
+            "dealer_up": dealer.card_one.value,
+            "dealer_cards": " ".join([str(card) for card in dealer.cards])
         }
         for hand in self._completed_hands:
             hand_data = {**hand.summary_data(), **additional_data}

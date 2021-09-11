@@ -96,7 +96,7 @@ class Hand:
             "card_two_value": self.cards[1].value,
             "card_one_rank": self.cards[0].rank,
             "card_two_rank": self.cards[1].rank,
-            "cards": [card.rank for card in self.cards],
+            "cards": " ".join([str(card) for card in self.cards]),
             "soft": int(self.soft),
             "from_split": int(self.from_split),
             "blackjack": int(self.blackjack),
@@ -135,3 +135,9 @@ class Hand:
             raise TypeError("Hand objects can only be compared to other "
                             "Hand objects.")
         return self.total == other.total
+
+    def __str__(self) -> str:
+        return (
+            " ".join([str(card) for card in self.cards]) +
+            f"\nTotal: {self.total}"
+        )

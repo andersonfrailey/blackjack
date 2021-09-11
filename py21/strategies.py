@@ -70,10 +70,17 @@ def basic_strategy(player, hand, dealer_up, game_params, **kwargs):
         return "HIT"
     elif action == "S":
         return "STAND"
-    elif action == "Dh":
-        return "DOUBLE-HIT"
-    elif action == "Ds":
-        return "DOUBLE-STAND"
+    elif action.startswith("D"):
+        # see if double down is allowed
+        allowed = len(hand.cards) == 2 and hand.player.bankroll >= hand.wager
+        if hand.from_split and allowed:
+            allowed = game_params.double_after_split
+        if not allowed:
+            if action.endswith("h"):
+                return "HIT"
+            elif action.endswith("s"):
+                return "STAND"
+        return "DOUBLE"
     elif action == "Rh":
         allowed = len(hand.cards) == 2 and game_params.surrender_allowed
         if hand.from_split:

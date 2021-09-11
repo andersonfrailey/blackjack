@@ -237,11 +237,11 @@ def house_edge(player, params):
     )).value_counts(normalize=True)
 
     ev = (
-        params.payout * results["win"] +
-        (params.blackjack_payout * results["blackjack"]) +
-        (2 * results["double"]) -
-        results["loss"] -
-        (params.surrender_pct * results["surrender"])
+        params.payout * results.get("win", 0) +
+        (params.blackjack_payout * results.get("blackjack", 0)) +
+        (2 * results.get("double", 0)) -
+        results.get("loss", 0) -
+        (params.surrender_pct * results.get("surrender", 0))
     )
 
     print(
