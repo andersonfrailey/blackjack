@@ -87,3 +87,6 @@ game.simulate(1000000)
 ```
 
 A list of the game parameters you can update can be found [here](https://github.com/andersonfrailey/blackjack/blob/master/docs/default_rules.md).
+
+As of version 1.6.0, there is also a CLI for `py21`. To use it, run `blackjack`
+from the command line.
