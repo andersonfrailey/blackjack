@@ -1,7 +1,7 @@
 """
 Definition of the player class
 """
-from .strategies import basic_strategy, minimum_bet, decline_insurance
+from py21.strategies import basic_strategy, minimum_bet, decline_insurance
 
 
 class Player:

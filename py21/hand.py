@@ -1,8 +1,8 @@
 """
 Hand class definition
 """
-from .card import Card
-from .player import Player
+from py21.card import Card
+from py21.player import Player
 
 
 class Hand:
