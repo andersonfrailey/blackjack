@@ -4,13 +4,13 @@ Command line interface to play blackjack with
 import argparse
 
 from numpy.core.numeric import correlate
-from .game import Game
-from .player import Player
-from .strategies import basic_strategy
+from py21.game import Game
+from py21.player import Player
+from py21.strategies import basic_strategy
 
 
 BASIC_MAP = {
-    "HIT": "H", "STAND": "S", "DOUBLE": "D", "SPLIT": "Sp", "SURRENDER": "Rh"
+    "HIT": "H", "STAND": "S", "DOUBLE": "D", "SPLIT": "SP", "SURRENDER": "R"
 }
 ACTION_MAP = {value: key for key, value in BASIC_MAP.items()}
 correct = 0
@@ -122,7 +122,10 @@ def validate_bet(bet, min_bet, max_bet, bankroll):
     """
     Ensure that the bet is acceptable
     """
-    if bet < min_bet:
+    if not (isinstance(bet, int) or isinstance(bet, float)):
+        print("Bet must be a float or integer")
+        return False
+    elif bet < min_bet:
         print(f"You must bet at least {min_bet}")
         return False
     elif bet > max_bet:
@@ -135,7 +138,7 @@ def validate_bet(bet, min_bet, max_bet, bankroll):
 
 
 def validate_action(action, hand, game_params):
-    options = ["H", "S", "D", "R", "Sp"]
+    options = ["H", "S", "D", "R", "SP"]
     if action.upper() not in options:
         print(f"{action} is invalid. Pick one of the following: {options}")
         return False

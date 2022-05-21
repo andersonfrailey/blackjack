@@ -7,8 +7,8 @@ dealing the cards, playing the players hands, and playing the dealer
 # pylint: disable=no-member
 import copy
 import difflib
-from .deck import Deck
-from .hand import Hand
+from py21.deck import Deck
+from py21.hand import Hand
 from paramtools.parameters import Parameters
 from tqdm import tqdm
 from pathlib import Path
@@ -169,7 +169,7 @@ class Game:
             # we only need the dealer to play their hand if there's someone
             # who hasn't busted or gotten blackjack
             for hand in self._completed_hands:
-                if not hand.bust and not hand.blackjack:
+                if not hand.bust and not hand.blackjack and not hand.surrender:
                     dealer_play = True
                     break
             if dealer_play:

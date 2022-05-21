@@ -1,7 +1,7 @@
 # Class for creating the deck
 
 import random
-from .card import Card
+from py21.card import Card
 
 
 class Deck:
