@@ -36,7 +36,7 @@ def test_game_implementation():
         return "SURRENDER"
 
     player = Player(100, strategy_func=surrender)
-    game = Game([player], rules=rules)
+    game = Game([player], rules=rules, verbose=True)
     with pytest.raises(ValueError):
         game.play_round()
 

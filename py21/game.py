@@ -136,14 +136,16 @@ class Game:
             for hand in hands:
                 print(f"{hand.cards[0]}{hand.cards[1]}")
                 print(f"Wager: {hand.wager}")
-            if dealer.blackjack:
-                print("Dealer Blackjack")
-                self._count(dealer.cards[1])
-                for hand in hands:
-                    self._completed_hands.append(hand)
         # check for dealer blackjack
+        if dealer.blackjack:
+            if self.verbose:
+                print("Dealer Blackjack")
+            self._count(dealer.cards[1])
+            for hand in hands:
+                self._completed_hands.append(hand)
         # play only if the dealer doesn't have blackjack
-        if not dealer.blackjack:
+        # if not dealer.blackjack:
+        else:
             # play each hand
             num_busts_splits_blackjacks = 0
             for _hand_id, hand in enumerate(hands):
@@ -177,7 +179,7 @@ class Game:
                 soft_stand = self.game_params.soft_stand
                 if dealer.total >= stand_total:
                     # logic for determining if a dealer plays soft hands
-                    if dealer.total == stand_total and dealer.soft:
+                    if (dealer.total == stand_total) and dealer.soft:
                         dealer_stand = soft_stand
                     else:
                         dealer_stand = True
@@ -191,7 +193,7 @@ class Game:
                         print(f"Dealer Draws: {card}")
                         print(f"New Dealer Total: {dealer.total}")
                     if dealer.total >= stand_total:
-                        if dealer.total == stand_total and dealer.soft:
+                        if (dealer.total == stand_total) and dealer.soft:
                             dealer_stand = soft_stand
                         else:
                             dealer_stand = True
@@ -269,7 +271,9 @@ class Game:
                 # only have two cards
                 card_match = hand.card_one == hand.cards[1]
                 starting_hand = len(hand.cards) == 2
+                # can only split if they have enough to cover second hand
                 bankroll = hand.player.bankroll >= hand.wager
+                # there are rules about how many times you can split
                 n_splits = self._num_splits < self.game_params.max_split_hands
                 allowed = (
                     card_match and starting_hand and bankroll and n_splits
@@ -481,10 +485,10 @@ class Game:
         pre_other_count = self.other_count
         if 2 <= card.value <= 6:
             self.count += 1
-        elif card.value >= 10:
+        elif card.value == 10:
             self.count -= 1
             self.ten_count -= 1
-        if card.value < 10:
+        if card.value != 10:
             self.other_count -= 1
         # update true count
         remaining_decks = len(self.deck) / 52

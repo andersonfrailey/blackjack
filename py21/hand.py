@@ -141,3 +141,6 @@ class Hand:
             " ".join([str(card) for card in self.cards]) +
             f"\nTotal: {self.total}"
         )
+
+    def __len__(self):
+        return len(self.cards)

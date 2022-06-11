@@ -171,8 +171,19 @@ def accept_insurance(**kwargs):
     return True
 
 
-def random_choice(**kwargs):
+def random_insurance(**kwargs):
+    """Randomly accepts insurance
+    """
+    return random.choice([True, False])
+
+
+def random_choice(player, hand, dealer_up, game_params, **kwargs):
     """
     Randomly pick a move
     """
-    return random.choice(["HIT", "STAND"])
+    # determine which actions are allowed
+    allowed_actions = ['HIT', 'STAND']
+    # see if split is possible
+    hand_len = len(hand)
+    same_card = hand.cards[0] == hand.cards[1]
+    bankroll = hand.player.bankroll >= hand.wager
