@@ -1,6 +1,7 @@
 """
 Definition of the player class
 """
+from multiprocessing.sharedctypes import Value
 from py21.strategies import basic_strategy, minimum_bet, decline_insurance
 
 
@@ -68,9 +69,8 @@ class Player:
             return "STAND"
         action = self.strategy_func(player=self, hand=hand,
                                     dealer_up=dealer_up, **kwargs).upper()
-        assert action in [
-            "STAND", "SPLIT", "HIT", "DOUBLE", "SURRENDER"
-        ]
+        if action not in hand.valid_actions:
+            raise ValueError("Invalid Action")
         return action
 
     def insurance(self, **kwargs):

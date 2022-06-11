@@ -134,16 +134,19 @@ class Hand:
         if len(self.cards) == 2:
             # first check for surrendering
             if self.game_params.surrender_allowed:
-                if self.from_split and self.game_params.surrender_after_split:
-                    valid.append("SURRENDER")
+                valid.append("SURRENDER")
+                if self.from_split and not self.game_params.surrender_after_split:
+                    valid.remove("SURRENDER")
             # doubling down
             if self.player.bankroll >= self.wager:
-                if self.from_split and self.game_params.double_after_split:
-                    valid.append("DOUBLE")
+                valid.append("DOUBLE")
+                if self.from_split and not self.game_params.double_after_split:
+                    valid.remove("DOUBLE")
             # splitting
-            if (self.card_one == self.cards[1]) and (self.player.bankroll >= self.wager):
-                if self.nsplits < self.game_params.max_split_hands:
-                    valid.append("SPLIT")
+            if (self.cards[0] == self.cards[1]) and (self.player.bankroll >= self.wager):
+                valid.append("SPLIT")
+                if self.nsplits >= self.game_params.max_split_hands:
+                    valid.remove("SPLIT")
         setattr(self, "valid_actions", valid)
 
     def __gt__(self, other):
