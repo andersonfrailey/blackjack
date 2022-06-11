@@ -7,7 +7,8 @@ from py21.player import Player
 
 class Hand:
 
-    def __init__(self, card_one, from_split=False, player=None, **kwargs):
+    def __init__(self, card_one, from_split=False, player=None,
+                 game_params=None, nsplits=0, dealer=False, **kwargs):
         """
         This class handles all of the logic for individual hads. It is
         initiated by passing in two cards that will are the starting cards,
@@ -45,6 +46,9 @@ class Hand:
         self.total = card_one.value
         self.surrender = False
         self.double_down = False
+        self.game_params = game_params
+        self.nsplits = nsplits
+        self.dealer = dealer
         # this is used to determine whether to add 11 or 1 when delt an ace
         self.non_ace_total = 0
         self.num_aces = 1 * self.soft
@@ -85,6 +89,8 @@ class Hand:
                 self.soft = True
         if self.total > 21:
             self.bust = True
+        if not self.dealer:
+            self._valid_actions()
 
     def summary_data(self):
         """
@@ -117,6 +123,28 @@ class Hand:
         if self.total == 21:
             setattr(self, "blackjack", True)
             setattr(self, "stand", True)
+
+    def _valid_actions(self):
+        """
+        Find all of the valid actions that can be taken with the hand
+        """
+        # hitting and standing are always allowed
+        valid = ["HIT", "STAND"]
+        # splits, doubling down, and surrendering can only be done with two cards
+        if len(self.cards) == 2:
+            # first check for surrendering
+            if self.game_params.surrender_allowed:
+                if self.from_split and self.game_params.surrender_after_split:
+                    valid.append("SURRENDER")
+            # doubling down
+            if self.player.bankroll >= self.wager:
+                if self.from_split and self.game_params.double_after_split:
+                    valid.append("DOUBLE")
+            # splitting
+            if (self.card_one == self.cards[1]) and (self.player.bankroll >= self.wager):
+                if self.nsplits < self.game_params.max_split_hands:
+                    valid.append("SPLIT")
+        setattr(self, "valid_actions", valid)
 
     def __gt__(self, other):
         if not isinstance(other, Hand):

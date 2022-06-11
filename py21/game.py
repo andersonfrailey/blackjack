@@ -97,14 +97,15 @@ class Game:
                               count=start_count, ten_count=start_ten_count,
                               other_count=start_other_count,
                               true_count=self.true_count,
-                              game_params=self.game_params))
+                              game_params=self.game_params,
+                              nsplits=self._num_splits))
         # break out of function if there are no more players with money
         if hands == []:
             return "break"
         # deal to dealer
         card = self.deck.deal()
         self._count(card)
-        dealer = Hand(card)
+        dealer = Hand(card, dealer=True)
         dealer_up = dealer.card_one
         # deal second card to all players
         for hand in hands:
@@ -313,7 +314,8 @@ class Game:
                                     other_count=start_other_count,
                                     true_count=self.true_count,
                                     game_params=self.game_params,
-                                    split_wager=hand.wager)
+                                    split_wager=hand.wager,
+                                    nsplits=self._num_splits)
                     hand_two = Hand(hand_two_card, from_split=True,
                                     player=hand.player,
                                     min_bet=min_bet,
@@ -324,7 +326,8 @@ class Game:
                                     other_count=start_other_count,
                                     true_count=self.true_count,
                                     game_params=self.game_params,
-                                    split_wager=hand.wager)
+                                    split_wager=hand.wager,
+                                    nsplits=self._num_splits)
                     # play both hands
                     if self.verbose:
                         print("Playing Split Hands")
