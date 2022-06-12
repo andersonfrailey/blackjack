@@ -54,6 +54,8 @@ class Hand:
         self.num_aces = 1 * self.soft
         self.num_hard_aces = self.num_aces
 
+        self.valid_actions = None
+
     def add_card_two(self, card):
         """
         Add second card to hand.

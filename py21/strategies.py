@@ -43,7 +43,7 @@ def basic_strategy(player, hand, dealer_up, game_params, **kwargs):
     One of the following: HIT, STAND, DOUBLE, SPLIT
     """
     # strategy for splits
-    if (hand.cards[0].value == hand.cards[1].value) and len(hand.cards) == 2:
+    if "SPLIT" in hand.valid_actions:
         action = BASIC_SPLIT[str(dealer_up)][hand.cards[0].value]
         if action == "P":
             return "SPLIT"
@@ -72,7 +72,8 @@ def basic_strategy(player, hand, dealer_up, game_params, **kwargs):
         return "STAND"
     elif action.startswith("D"):
         # see if double down is allowed
-        allowed = len(hand.cards) == 2 and hand.player.bankroll >= hand.wager
+        # allowed = len(hand.cards) == 2 and hand.player.bankroll >= hand.wager
+        allowed = "DOUBLE" in hand.valid_actions
         if hand.from_split and allowed:
             allowed = game_params.double_after_split
         if not allowed:
@@ -81,22 +82,15 @@ def basic_strategy(player, hand, dealer_up, game_params, **kwargs):
             elif action.endswith("s"):
                 return "STAND"
         return "DOUBLE"
-    elif action == "Rh":
-        allowed = len(hand.cards) == 2 and game_params.surrender_allowed
-        if hand.from_split:
-            allowed = game_params.surrender_after_split
+    elif action.startswith("R"):
+        allowed = "SURRENDER" in hand.valid_actions
         if allowed:
             return "SURRENDER"
         else:
-            return "HIT"
-    elif action == "Rs":
-        allowed = len(hand.cards) == 2 and game_params.surrender_allowed
-        if hand.from_split:
-            allowed = game_params.surrender_after_split
-        if allowed:
-            return "SURRENDER"
-        else:
-            return "STAND"
+            if action.endswith("h"):
+                return "HIT"
+            elif action.endswith("s"):
+                return "STAND"
     else:
         msg = f"{action} does not have associated action"
         raise ValueError(msg)
@@ -181,9 +175,5 @@ def random_choice(player, hand, dealer_up, game_params, **kwargs):
     """
     Randomly pick a move
     """
-    # determine which actions are allowed
-    allowed_actions = ['HIT', 'STAND']
-    # see if split is possible
-    hand_len = len(hand)
-    same_card = hand.cards[0] == hand.cards[1]
-    bankroll = hand.player.bankroll >= hand.wager
+    # randomly select an action from the allowed actions in a hand
+    return random.choice(hand.valid_actions)
