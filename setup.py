@@ -6,7 +6,7 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="py21",
-    version=os.environ.get("VERSION", "1.6.0"),
+    version=os.environ.get("VERSION", "1.6.1"),
     author="Anderson Frailey",
     author_email="andersonfrailey@gmail.org",
     description="Library for running blackjack simulations",
@@ -21,10 +21,11 @@ setuptools.setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
-        "License :: OSI Approved :: MIT License"
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "License :: OSI Approved :: MIT License",
     ],
     include_package_data=True,
-    entry_points= {
-        "console_scripts": ["blackjack=py21.cli:cli_main"]
-    }
+    entry_points={"console_scripts": ["blackjack=py21.cli:cli_main"]},
 )
