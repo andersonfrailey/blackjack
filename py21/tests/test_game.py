@@ -1,6 +1,7 @@
 """
 Test suite for the game class
 """
+
 # ignore no-member in pylist because it's raised for the game parameters
 # because pylint doesn't know about paramtools
 # pylint: disable=no-member
@@ -14,8 +15,7 @@ def test_game_implementation():
     with pytest.raises(TypeError):
         Game([Player(100)], "str")
     # ensure that the parameters are updated properly
-    rules = {"insurance_allowed": False,
-             "blackjack_payout": 1.2}
+    rules = {"insurance_allowed": False, "blackjack_payout": 1.2}
     game = Game([Player(100)], rules)
     assert game.game_params.blackjack_payout == 1.2
     assert not game.game_params.insurance_allowed

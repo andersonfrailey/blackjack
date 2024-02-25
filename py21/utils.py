@@ -34,7 +34,7 @@ def results_pct(data, as_series=True):
 def detailed_results_pct(data):
     """
     """
-    # make a copy od the data since we'll be modifying it
+    # make a copy of the data since we'll be modifying it
     data = copy.deepcopy(data)
     if isinstance(data, list):
         data = pd.DataFrame(data)
@@ -179,16 +179,19 @@ def outcome_bars(data, name=None, width=100):
     for _name, _data in zip(name, data_list):
         win, loss, push, surrender = results_pct(_data, as_series=False)
         plot_data_list.append(
-            {"game": _name, "result": "Win", "pct": win, "order": 1},
+            {"game": _name, "result": "Win", "pct": round(win * 100, 2),
+            "order": 1},
         )
         plot_data_list.append(
-            {"game": _name, "result": "Loss", "pct": loss, "order": 2}
+            {"game": _name, "result": "Loss", "pct": round(loss * 100, 2), "order": 2}
         )
         plot_data_list.append(
-            {"game": _name, "result": "Push", "pct": push, "order": 3}
+            {"game": _name, "result": "Push", "pct": round(push * 100, 2),
+            "order": 3}
         )
         plot_data_list.append(
-            {"game": _name, "result": "Surrender", "pct": surrender, "order": 3}
+            {"game": _name, "result": "Surrender", "pct": round(surrender * 100, 2),
+            "order": 3}
         )
     plot_data = pd.DataFrame(plot_data_list)
 
@@ -231,16 +234,21 @@ def house_edge(player, params):
         np.logical_and(data["result"] == "win", data["blackjack"]),
         "blackjack", data['result']
     )
+    results = np.where(
+        np.logical_and(data["double_down"], data["result"] == "loss"),
+        "double_loss", results
+    )
     results = pd.Series(np.where(
         np.logical_and(data["double_down"], data["result"] == "win"),
-        "double", results
+        "double_win", results
     )).value_counts(normalize=True)
 
     ev = (
         params.payout * results.get("win", 0) +
         (params.blackjack_payout * results.get("blackjack", 0)) +
-        (2 * results.get("double", 0)) -
+        (2 * results.get("double_win", 0)) -
         results.get("loss", 0) -
+        (2 * results.get("double_loss", 0)) -
         (params.surrender_pct * results.get("surrender", 0))
     )
 
@@ -250,4 +258,4 @@ def house_edge(player, params):
         "approximation"
     )
 
-    return ev
+    return -ev * 100

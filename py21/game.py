@@ -2,6 +2,7 @@
 The Game class is used to handle all of the logistics of the game including
 dealing the cards, playing the players hands, and playing the dealer
 """
+
 # ignore no-member in pylist because it's raised for the game parameters
 # because pylint doesn't know about paramtools
 # pylint: disable=no-member
@@ -24,8 +25,7 @@ class GameParams(Parameters):
 
 class Game:
 
-    def __init__(self, players, rules=None, verbose=False, test=False,
-                 seed=None):
+    def __init__(self, players, rules=None, verbose=False, test=False, seed=None):
         """
         Parameters
         ----------
@@ -92,13 +92,20 @@ class Game:
                 continue
             card_one = self.deck.deal()
             self._count(card_one)
-            hands.append(Hand(card_one, player=player,
-                              min_bet=min_bet, max_bet=max_bet,
-                              count=start_count, ten_count=start_ten_count,
-                              other_count=start_other_count,
-                              true_count=self.true_count,
-                              game_params=self.game_params,
-                              nsplits=self._num_splits))
+            hands.append(
+                Hand(
+                    card_one,
+                    player=player,
+                    min_bet=min_bet,
+                    max_bet=max_bet,
+                    count=start_count,
+                    ten_count=start_ten_count,
+                    other_count=start_other_count,
+                    true_count=self.true_count,
+                    game_params=self.game_params,
+                    nsplits=self._num_splits,
+                )
+            )
         # break out of function if there are no more players with money
         if hands == []:
             return "break"
@@ -125,7 +132,7 @@ class Game:
                         count=self.count,
                         ten_count=self.ten_count,
                         other_count=self.other_count,
-                        game_params=self.game_params
+                        game_params=self.game_params,
                     )
                     setattr(hand, "insurance", insurance)
                     if insurance:
@@ -158,8 +165,14 @@ class Game:
                     num_busts_splits_blackjacks += 1
                     # continue
                 self._play_hand(
-                    hand, dealer_up.value, min_bet, max_bet, hand_id,
-                    start_count, start_ten_count, start_other_count
+                    hand,
+                    dealer_up.value,
+                    min_bet,
+                    max_bet,
+                    hand_id,
+                    start_count,
+                    start_ten_count,
+                    start_other_count,
                 )
                 # reset number of splt hands
                 setattr(self, "_num_splits", 0)
@@ -199,9 +212,12 @@ class Game:
                         else:
                             dealer_stand = True
 
-        self._compare(dealer, self.game_params.payout,
-                      self.game_params.blackjack_payout,
-                      self.game_params.split_blackjack_payout)
+        self._compare(
+            dealer,
+            self.game_params.payout,
+            self.game_params.blackjack_payout,
+            self.game_params.split_blackjack_payout,
+        )
         # clear completed hands list
         del self._completed_hands[:]
         # check if the deck should be shuffled
@@ -249,19 +265,31 @@ class Game:
                 raise ValueError(msg)
         self.game_params.adjust(rules)
 
-    def _play_hand(self, hand, dealer_up, min_bet, max_bet, hand_id,
-                   start_count, start_ten_count, start_other_count):
+    def _play_hand(
+        self,
+        hand,
+        dealer_up,
+        min_bet,
+        max_bet,
+        hand_id,
+        start_count,
+        start_ten_count,
+        start_other_count,
+    ):
         """
         Function that contains all of the logic for playing a hand
         """
         while not hand.stand and not hand.bust and not hand.surrender:
-            action = hand.player.action(hand, dealer_up,
-                                        start_count=start_count,
-                                        count=self.count,
-                                        ten_count=self.ten_count,
-                                        other_count=self.other_count,
-                                        true_count=self.true_count,
-                                        game_params=self.game_params)
+            action = hand.player.action(
+                hand,
+                dealer_up,
+                start_count=start_count,
+                count=self.count,
+                ten_count=self.ten_count,
+                other_count=self.other_count,
+                true_count=self.true_count,
+                game_params=self.game_params,
+            )
             if self.verbose:
                 print(f"Player action: {action}")
             if action == "STAND":
@@ -281,30 +309,36 @@ class Game:
                 # create two new hands using original two cards
                 hand_one_card = hand.card_one
                 hand_two_card = hand.cards[1]
-                hand_one = Hand(hand_one_card, from_split=True,
-                                player=hand.player,
-                                min_bet=min_bet,
-                                max_bet=max_bet,
-                                start_count=start_count,
-                                count=start_count,
-                                ten_count=start_ten_count,
-                                other_count=start_other_count,
-                                true_count=self.true_count,
-                                game_params=self.game_params,
-                                split_wager=hand.wager,
-                                nsplits=self._num_splits)
-                hand_two = Hand(hand_two_card, from_split=True,
-                                player=hand.player,
-                                min_bet=min_bet,
-                                max_bet=max_bet,
-                                start_count=start_count,
-                                count=start_count,
-                                ten_count=start_ten_count,
-                                other_count=start_other_count,
-                                true_count=self.true_count,
-                                game_params=self.game_params,
-                                split_wager=hand.wager,
-                                nsplits=self._num_splits)
+                hand_one = Hand(
+                    hand_one_card,
+                    from_split=True,
+                    player=hand.player,
+                    min_bet=min_bet,
+                    max_bet=max_bet,
+                    start_count=start_count,
+                    count=start_count,
+                    ten_count=start_ten_count,
+                    other_count=start_other_count,
+                    true_count=self.true_count,
+                    game_params=self.game_params,
+                    split_wager=hand.wager,
+                    nsplits=self._num_splits,
+                )
+                hand_two = Hand(
+                    hand_two_card,
+                    from_split=True,
+                    player=hand.player,
+                    min_bet=min_bet,
+                    max_bet=max_bet,
+                    start_count=start_count,
+                    count=start_count,
+                    ten_count=start_ten_count,
+                    other_count=start_other_count,
+                    true_count=self.true_count,
+                    game_params=self.game_params,
+                    split_wager=hand.wager,
+                    nsplits=self._num_splits,
+                )
                 # play both hands
                 if self.verbose:
                     print("Playing Split Hands")
@@ -317,8 +351,14 @@ class Game:
                 if from_aces and not self.game_params.hit_split_aces:
                     setattr(hand_one, "stand", True)
                 self._play_hand(
-                    hand_one, dealer_up, min_bet, max_bet, hand_id,
-                    start_count, start_ten_count, start_other_count
+                    hand_one,
+                    dealer_up,
+                    min_bet,
+                    max_bet,
+                    hand_id,
+                    start_count,
+                    start_ten_count,
+                    start_other_count,
                 )
                 if self.verbose:
                     print("Second Split Hand")
@@ -331,8 +371,14 @@ class Game:
                 if from_aces and not self.game_params.hit_split_aces:
                     setattr(hand_two, "stand", True)
                 self._play_hand(
-                    hand_two, dealer_up, min_bet, max_bet, hand_id,
-                    start_count, start_ten_count, start_other_count
+                    hand_two,
+                    dealer_up,
+                    min_bet,
+                    max_bet,
+                    hand_id,
+                    start_count,
+                    start_ten_count,
+                    start_other_count,
                 )
                 # exit loop
                 break
@@ -348,27 +394,32 @@ class Game:
             elif action == "SURRENDER":
                 # only allow surrender if they player hasn't taken a
                 # card yet and if the game rules allow
+                if len(hand) > 2:
+                    raise ValueError("Cannot surrender after taking a card")
+                if not self.game_params.surrender_allowed:
+                    raise ValueError("Surrendering is not allowed")
                 if self.verbose:
                     print("Surrendering")
                 setattr(hand, "surrender", True)
                 continue
             if action == "HIT" or action == "DOUBLE":
-                hit_data = {"start_total": hand.total,
-                            "start_count": self.count,
-                            "start_ten_count": self.ten_count,
-                            "start_other_count": self.other_count,
-                            "round_id": self.round_id,
-                            "hand_id": hand_id,
-                            "action": action,
-                            "soft": int(hand.soft),
-                            "start_true_count": self.true_count}
+                hit_data = {
+                    "start_total": hand.total,
+                    "start_count": self.count,
+                    "start_ten_count": self.ten_count,
+                    "start_other_count": self.other_count,
+                    "round_id": self.round_id,
+                    "hand_id": hand_id,
+                    "action": action,
+                    "soft": int(hand.soft),
+                    "start_true_count": self.true_count,
+                }
                 card = self.deck.deal()
                 hit_data["card_received_rank"] = card.rank
                 self._count(card)
                 hand.add_card(card)
                 hit_data["new_total"] = hand.total
-                card_received_value = (hit_data["new_total"] -
-                                       hit_data["start_total"])
+                card_received_value = hit_data["new_total"] - hit_data["start_total"]
                 hit_data["card_received_value"] = card_received_value
                 self.hit_results.append(hit_data)
                 if self.verbose:
@@ -386,7 +437,7 @@ class Game:
             "round_id": self.round_id,
             "dealer_blackjack": int(dealer.blackjack),
             "dealer_up": dealer.card_one.value,
-            "dealer_cards": " ".join([str(card) for card in dealer.cards])
+            "dealer_cards": " ".join([str(card) for card in dealer.cards]),
         }
         for hand in self._completed_hands:
             hand_data = {**hand.summary_data(), **additional_data}
@@ -398,37 +449,73 @@ class Game:
                 print(f"Player Total: {hand.total}")
                 print(f"Dealer Total: {dealer.total}")
             if hand.bust:
-                hand.player.settle_up(hand_data, dealer.total,
-                                      "loss", payout, blackjack_payout,
-                                      dealer.blackjack, split_bj_payout,
-                                      self.game_params.surrender_pct)
+                hand.player.settle_up(
+                    hand_data,
+                    dealer.total,
+                    "loss",
+                    payout,
+                    blackjack_payout,
+                    dealer.blackjack,
+                    split_bj_payout,
+                    self.game_params.surrender_pct,
+                )
             elif hand.surrender:
-                hand.player.settle_up(hand_data, dealer.total,
-                                      "surrender", payout, blackjack_payout,
-                                      dealer.blackjack, split_bj_payout,
-                                      self.game_params.surrender_pct)
+                hand.player.settle_up(
+                    hand_data,
+                    dealer.total,
+                    "surrender",
+                    payout,
+                    blackjack_payout,
+                    dealer.blackjack,
+                    split_bj_payout,
+                    self.game_params.surrender_pct,
+                )
             elif dealer.bust:
-                hand.player.settle_up(hand_data, dealer.total,
-                                      "win", payout, blackjack_payout,
-                                      dealer.blackjack, split_bj_payout,
-                                      self.game_params.surrender_pct)
+                hand.player.settle_up(
+                    hand_data,
+                    dealer.total,
+                    "win",
+                    payout,
+                    blackjack_payout,
+                    dealer.blackjack,
+                    split_bj_payout,
+                    self.game_params.surrender_pct,
+                )
             elif hand > dealer:
-                hand.player.settle_up(hand_data, dealer.total,
-                                      "win", payout, blackjack_payout,
-                                      dealer.blackjack, split_bj_payout,
-                                      self.game_params.surrender_pct)
+                hand.player.settle_up(
+                    hand_data,
+                    dealer.total,
+                    "win",
+                    payout,
+                    blackjack_payout,
+                    dealer.blackjack,
+                    split_bj_payout,
+                    self.game_params.surrender_pct,
+                )
             elif hand < dealer:
-                hand.player.settle_up(hand_data, dealer.total,
-                                      "loss", payout, blackjack_payout,
-                                      dealer.blackjack, split_bj_payout,
-                                      self.game_params.surrender_pct)
+                hand.player.settle_up(
+                    hand_data,
+                    dealer.total,
+                    "loss",
+                    payout,
+                    blackjack_payout,
+                    dealer.blackjack,
+                    split_bj_payout,
+                    self.game_params.surrender_pct,
+                )
             else:
                 if self.verbose:
                     print("Push")
-                hand.player.settle_up(hand_data, dealer.total,
-                                      "push", payout, blackjack_payout,
-                                      dealer.blackjack, split_bj_payout,
-                                      self.game_params.surrender_pct)
+                hand.player.settle_up(
+                    hand_data,
+                    dealer.total,
+                    "push",
+                    payout,
+                    blackjack_payout,
+                    dealer.blackjack,
+                    split_bj_payout,
+                    self.game_params.surrender_pct,
+                )
             if self.verbose:
                 print(f"Player Bankroll: {hand.player.bankroll}\n")
 
@@ -460,6 +547,6 @@ class Game:
                 "post_true_count": self.true_count,
                 "pre_other_count": pre_other_count,
                 "post_other_count": self.other_count,
-                "card_value": card.value
+                "card_value": card.value,
             }
         )
