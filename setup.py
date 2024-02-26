@@ -17,7 +17,6 @@ setuptools.setup(
     install_requires=["tqdm", "paramtools", "pandas"],
     tests_require=["pytest"],
     classifiers=[
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
