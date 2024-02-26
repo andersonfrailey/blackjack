@@ -5,7 +5,7 @@ import pytest
 from py21 import Card, Hand, Player
 
 
-def test_hand_implementation():
+def test_hand_implementation(basic_game):
     card_one = Card(2, "C")
     card_two = Card(3, "H")
     player = Player(100, None, None)
@@ -16,7 +16,10 @@ def test_hand_implementation():
     with pytest.raises(TypeError):
         Hand(card_one, card_two, dict)
 
-    hand = Hand(Card(12, "H"))
+    hand = Hand(
+        Card(12, "H"), player=Player(100), game_params=basic_game.game_params,
+        min_bet=5, max_bet=500
+    )
     hand.add_card_two(Card(5, "S"))
     assert hand.total == 15
     assert not hand.soft
@@ -26,10 +29,13 @@ def test_hand_implementation():
     assert hand.bust
 
 
-def test_add_card_two():
+def test_add_card_two(basic_game):
     card = Card(3, "C")
     player = Player(100, None)
-    hand = Hand(card, player)
+    hand = Hand(
+        card, player=player, game_params=basic_game.game_params,
+        min_bet=5, max_bet=500
+    )
     with pytest.raises(TypeError):
         hand.add_card_two("2C")
     card_two = Card(2, "D")
@@ -37,9 +43,9 @@ def test_add_card_two():
     assert hand.total == 5
 
 
-def test_comparisons():
+def test_comparisons(basic_game):
     hand = Hand(Card(2, "H"), player=Player(100, None, None),
-                min_bet=5, max_bet=500)
+                min_bet=5, max_bet=500, game_params=basic_game.game_params)
     hand.add_card_two(Card(3, "D"))
     with pytest.raises(TypeError):
         hand > 3
@@ -49,17 +55,26 @@ def test_comparisons():
         hand == 3
 
 
-def test_blackjack():
-    hand = Hand(Card(14, "C"))
+def test_blackjack(basic_game):
+    hand = Hand(
+        Card(14, "C"), player=Player(100), game_params=basic_game.game_params,
+        min_bet=5, max_bet=500
+    )
     hand.add_card_two(Card(10, "D"))
     assert hand.blackjack
-    hand = Hand(Card(12, "C"))
+    hand = Hand(
+        Card(12, "C"), player=Player(100), game_params=basic_game.game_params,
+        min_bet=5, max_bet=500
+    )
     hand.add_card_two(Card(14, "S"))
     assert hand.blackjack
 
 
-def test_soft():
-    hand = Hand(Card(14, "C"))
+def test_soft(basic_game):
+    hand = Hand(
+        Card(14, "C"), player=Player(100), game_params=basic_game.game_params,
+        min_bet=5, max_bet=500
+    )
     hand.add_card_two(Card(14, "D"))
     assert hand.soft
     assert hand.total == 12
@@ -70,18 +85,27 @@ def test_soft():
     assert not hand.soft
     assert hand.total == 13
 
-    hand = Hand(Card(5, "D"))
+    hand = Hand(
+        Card(5, "D"), player=Player(100), game_params=basic_game.game_params,
+        min_bet=5, max_bet=500
+    )
     hand.add_card_two(Card(14, "S"))
     assert hand.soft
     assert hand.total == 16
 
-    hand = Hand(Card(6, "H"))
+    hand = Hand(
+        Card(6, "H"), player=Player(100), game_params=basic_game.game_params,
+        min_bet=5, max_bet=500
+    )
     hand.add_card_two(Card(3, "H"))
     hand.add_card(Card(14, "H"))
     assert hand.soft
     assert hand.total == 20
 
-    hand = Hand(Card(14, "D"))
+    hand = Hand(
+        Card(14, "D"), player=Player(100), game_params=basic_game.game_params,
+        min_bet=5, max_bet=500
+    )
     hand.add_card_two(Card(3, "H"))
     hand.add_card(Card(10, "C"))
     assert not hand.soft
@@ -90,7 +114,10 @@ def test_soft():
     assert hand.total == 15
     assert not hand.soft
 
-    hand = Hand(Card(3, "D"))
+    hand = Hand(
+        Card(3, "D"), player=Player(100), game_params=basic_game.game_params,
+        min_bet=5, max_bet=500
+    )
     hand.add_card_two(Card(6, "S"))
     hand.add_card(Card(2, "H"))
     hand.add_card(Card(14, "S"))
@@ -98,7 +125,10 @@ def test_soft():
     assert hand.total == 12
 
     # edge case. you're delt a bunch of aces
-    hand = Hand(Card(14, "S"))
+    hand = Hand(
+        Card(14, "S"), player=Player(100), game_params=basic_game.game_params,
+        min_bet=5, max_bet=500
+    )
     hand.add_card_two(Card(14, "D"))
     for _ in range(9):
         hand.add_card(Card(14, "S"))

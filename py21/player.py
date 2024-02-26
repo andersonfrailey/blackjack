@@ -1,6 +1,7 @@
 """
 Definition of the player class
 """
+from multiprocessing.sharedctypes import Value
 from py21.strategies import basic_strategy, minimum_bet, decline_insurance
 
 
@@ -59,18 +60,19 @@ class Player:
         self.total_wagered += wager
         return wager
 
-    def action(self, hand, dealer_up, **kwargs):
+    def action(self, hand, dealer_up, game_params, **kwargs):
         """
         This method is a wrapper for the strategy function passed in by the
         user when initializing the Player object.
         """
         if hand.blackjack:
             return "STAND"
-        action = self.strategy_func(player=self, hand=hand,
-                                    dealer_up=dealer_up, **kwargs).upper()
-        assert action in [
-            "STAND", "SPLIT", "HIT", "DOUBLE", "SURRENDER"
-        ]
+        action = self.strategy_func(
+            player=self, hand=hand, dealer_up=dealer_up,
+            game_params=game_params, **kwargs
+        ).upper()
+        if action not in hand.valid_actions:
+            self._raise_error(action, hand, game_params)
         return action
 
     def insurance(self, **kwargs):
@@ -133,3 +135,33 @@ class Player:
         self.roi = (self.bankroll - self.start_bankroll) / self.total_wagered
         additonal_data["roi"] = self.roi
         self.history.append({**hand_data, **additonal_data})
+
+    def _raise_error(self, action, hand, game_params):
+        """
+        Explain why the given action was invalid
+        """
+        if action == "SURRENDER":
+            if not game_params.surrender_allowed:
+                msg = "Surrendering is not allowed"
+            elif hand.from_split and not game_params.surrender_after_split:
+                msg = "Surrendering not allowed after splitting"
+            elif len(hand) != 2:
+                msg = "Cannot surrender after taking a card"
+        elif action == "DOUBLE":
+            if len(hand) != 2:
+                msg = "Cannot double down after taking a card"
+            elif self.bankroll < hand.wager:
+                raise ValueError("Insufficient funds to double down")
+            elif hand.from_split and not game_params.double_after_split:
+                msg = "Not allowed to double after a split"
+        elif action == "SPLIT":
+            if len(hand) != 2:
+                msg = "Cannot split after taking a card"
+            elif self.bankroll < hand.wager:
+                raise ValueError("Insufficient funds to split")
+            elif hand.cards[0] != hand.cards[1]:
+                msg = "Can only split matching cards"
+            elif hand.nsplits > game_params.max_split_hands:
+                msg = f"Cannot split more than {game_params.max_split_hands} times"
+
+        raise ValueError(msg)
